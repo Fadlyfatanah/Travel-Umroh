@@ -1,0 +1,25 @@
+// -- ------------------------------------
+// -- Perhatian
+// -- Khusus untuk Linux User : 
+// -- hasil dari Copy Path tidak perlu diganti dengan double-backslash \\
+// -- ------------------------------------
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Odoo",
+            "type": "python",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "python": "/usr/bin/python3", // cari dengan which python3
+            "program": "/home/fadly/odoo/odoo-14.0/odoo-server",
+            "args": [
+                "--config=/home/fadly/odoo/conf/odoo-xyz-travel-umroh.conf",
+                "--database=v14-xyztravelumroh",
+                // "--update=purchase_conversion_uom"
+                // "--update=asb_update_sale_order"
+                "--update=xyz_travel_umroh"
+            ]
+        },
+    ]
+}
