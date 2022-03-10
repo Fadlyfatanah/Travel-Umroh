@@ -15,7 +15,7 @@ class AirlineLines(models.Model):
     _name = 'airline.lines'
     _description = 'Airline Lines'
     
-    name = fields.Many2one('res.partner', string='Airlines', required=True, domain=[('airlines', '=', True)])
+    name = fields.Many2one('res.partner', string='Airline', required=True, domain=[('airlines', '=', True)])
     departure_date = fields.Date(required=True, )
     departure_city = fields.Char(required=True, )
     arrival_city = fields.Char(required=True, )

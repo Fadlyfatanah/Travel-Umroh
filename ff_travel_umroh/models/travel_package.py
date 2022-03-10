@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from email.policy import default
+import string
 from odoo import models, fields, api, _
 from datetime import timedelta
 
@@ -7,34 +9,41 @@ from datetime import timedelta
 class TravelPackage(models.Model):
     _name = 'travel.package'
     _description = 'Travel Package'
-    _inherit = 'mail.thread'
+    _inherit = ['mail.thread', 'portal.mixin']
 
     name = fields.Char(required=True, copy=False, readonly=True, index=True, default=lambda self: _('/'))
-    departure_date = fields.Date(required=True, )
-    return_date = fields.Date(required=True, )
-    product_id = fields.Many2one('product.product', 'Sale', required=True, )
+    departure_date = fields.Date(required=True, string='Departure Date')
+    return_date = fields.Date(required=True, string='Return Date')
+    product_id = fields.Many2one('product.product', 'Product', required=True, )
     package_id = fields.Many2one('mrp.bom', 'Package', required=True, )
-    quota = fields.Integer()
-    hotel_line = fields.One2many('hotel.lines', 'travel_id')
-    airlines_line = fields.One2many('airline.lines', 'travel_id', string='Airlines')
+    quota = fields.Integer('Quota')
+    hotel_line = fields.One2many('hotel.lines', 'travel_id', string='Hotel')
+    airlines_line = fields.One2many('airline.lines', 'travel_id', string='Airline')
     schedule_line = fields.One2many('schedule.lines', 'travel_id', string='Schedule')
-    hpp_line = fields.One2many('hpp.lines', 'travel_id')
+    hpp_line = fields.One2many('hpp.lines', 'travel_id', string='HPP')
     remaining_seats = fields.Integer(compute='_get_manifest_count', readonly=True)
     quota_progress = fields.Float(compute='_compute_quota_progress')
-    manifest_travel_line = fields.One2many('manifest.lines.travel', 'travel_id', readonly=True)
+    manifest_travel_line = fields.One2many('manifest.lines.travel', 'travel_id', readonly=True, string='Manifest')
     amount_total = fields.Monetary(string='Total', store=True, readonly=True, track_visibility='always', track_sequence=6, compute='_compute_get_price_total')
-    pricelist_id = fields.Many2one('product.pricelist', string='Pricelist', readonly=True, states={
-                                   'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Pricelist for current sales order.")
-    currency_id = fields.Many2one("res.currency", related='pricelist_id.currency_id', string="Currency", readonly=True)
+    company_id = fields.Many2one('res.company', string='Company', default=1)
+    currency_id = fields.Many2one("res.currency", related='company_id.currency_id', string="Currency", readonly=True)
     state = fields.Selection([
         ('draft', 'Draft'),
+        ('reschedule', 'Reschedule'),
         ('confirm', 'Confirmed'),
-        ('done', 'Done')
-    ], default='draft')
+        ('done', 'Done'),
+        ('cancel', 'Cancel'),
+    ], default='draft', string='Status')
+
+    def _compute_access_url(self):
+        super(TravelPackage, self)._compute_access_url()
+        for package in self:
+            package.access_url = '/my/package/%s' % package.id
 
     @api.depends('quota', 'manifest_travel_line')
     def _compute_quota_progress(self):
         for r in self:
+            r.quota_progress = 0
             if len(r.manifest_travel_line) <= r.quota and r.quota > 0:
                 r.quota_progress = 100.0 * (len(r.manifest_travel_line) / r.quota)
             # else:

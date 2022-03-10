@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="portal_layout" name="Portal layout: package menu entry" inherit_id="portal.portal_breadcrumbs" priority="40">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'package' or package" class="col-lg-2" t-attf-class="breadcrumb-item #{'active ' if not package else ''}">
+                <a t-if="package" t-attf-href="/my/packages?{{ keep_query() }}">Packages</a>
+                <t t-else="">Packages</t>
+            </li>
+            <li t-if="package" class="breadcrumb-item active text-truncate col-8 col-lg-10">
+                <t t-esc="package.name"/>
+            </li>
+        </xpath>
+    </template>
+
+    <template id="portal_my_home_travel_package" name="Show Travel Package" customize_show="True" inherit_id="portal.portal_my_home" priority="30">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Travel Package</t>
+                <t t-set="url" t-value="'/my/packages'"/>
+                <t t-set="placeholder_count" t-value="'package_count'"/>
+            </t>
+        </xpath>
+    </template>
+
+    <template id="portal_my_packages" name="My Packages">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Travel Packages</t>
+            </t>
+            <t t-if="not packages">
+                <p>There are currently no packages for your account.</p>
+            </t>
+            <t t-if="packages" t-call="portal.portal_table">
+                <thead>
+                    <tr class="active">
+                        <th>Package #</th>
+                        <th class="text-right">Departure Date</th>
+                        <th class="text-right">Return Date</th>
+                        <th class="text-center">Status</th>
+                    </tr>
+                </thead>
+                <t t-foreach="packages" t-as="package">
+                    <tr>
+                        <td><a t-attf-href="/my/package/#{package.id}?{{ keep_query() }}"><span t-field="package.name"/></a></td>
+                        <td class="text-right"><span t-field="package.departure_date"/></td>
+                        <td class="text-right"><span t-field="package.return_date"/></td>
+                        <td class="text-center">
+                            <span t-if="package.state == 'reschedule'" class="badge badge-pill badge-secondary"><i class="fa fa-fw fa-clock-o"/> Reschedule</span>
+                            <span t-if="package.state == 'confirm'" class="badge badge-pill badge-warning"><i class="fa fa-fw fa-folder-open"/> Open</span>
+                            <span t-if="package.state == 'done'" class="badge badge-pill badge-success"><i class="fa fa-fw fa-calendar-check-o"/> Done</span>
+                            <span t-if="package.state == 'cancel'" class="badge badge-pill badge-light"><i class="fa fa-fw fa-remove"/> Cancelled</span>
+                        </td>
+                    </tr>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="portal_my_package" name="My Package">
+        <t t-call="portal.portal_layout">
+            <t t-set="o_portal_fullwidth_alert" groups="ff_travel_umroh.group_travel_umroh_user">
+                <t t-call="portal.portal_back_in_edit_mode">
+                    <t t-set="backend_url" t-value="'/web#model=travel.package&amp;id=%s&amp;view_type=form' % (package.id)"/>
+                </t>
+            </t>
+            <t t-call="portal.portal_record_layout">
+                <t t-set="card_header" >
+                    <span class="float-right">
+                        <span t-if="package.state == 'reschedule'" class=" badge badge-pill badge-secondary"  style="font-size: 16px;"><i class="fa fa-fw fa-clock-o"/> Reschedule</span>
+                        <span t-if="package.state == 'confirm'" class=" badge badge-pill badge-warning"  style="font-size: 16px;"><i class="fa fa-fw fa-folder-open"/> Open</span>
+                        <span t-if="package.state == 'done'" class=" badge badge-pill badge-success"  style="font-size: 16px;"><i class="fa fa-fw fa-calendar-check-o"/> Done</span>
+                        <span t-if="package.state == 'cancel'" class=" badge badge-pill badge-light"  style="font-size: 16px;"><i class="fa fa-fw fa-remove"/> Cancelled</span>
+                    </span>
+                </t>
+                <t t-set="card_body">
+                    <section style="page-break-inside: auto;" class="o_group">
+                        <table class="table-sm">
+                            <tbody>
+                                <tr>
+                                    <th class="text-left">Reference</th>
+                                    <td><b>:</b></td>
+                                    <td>
+                                        <span t-field="package.name"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="text-left">Date</th>
+                                    <td><b>:</b></td>
+                                    <td>
+                                        <span t-field="package.departure_date"/>
+                                        <i>to</i>
+                                        <span t-field="package.return_date"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="text-left">Package</th>
+                                    <td><b>:</b></td>
+                                    <td>
+                                        <span t-field="package.package_id.product_tmpl_id.name"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="text-left">Quota</th>
+                                    <td><b>:</b></td>
+                                    <td>
+                                        <span t-field="package.quota"/>
+                                        <span>Persons</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+                    <br/>
+                    <section class="o_notebook">
+                        <div class="o_notebook_headers">
+                            <ul class="nav nav-tabs">
+                                <li class="nav-item">
+                                    <a data-toggle="tab" disable_anchor="true" href="#hotel_tab" class="nav-link" role="tab">Hotel</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a data-toggle="tab" disable_anchor="true" href="#airline_tab" class="nav-link" role="tab">Airline</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a data-toggle="tab" disable_anchor="true" href="#jamaah_tab" class="nav-link" role="tab">Jamaah</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a data-toggle="tab" disable_anchor="true" href="#schedule_tab" class="nav-link" role="tab">Schedule</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="tab-content" string="Schedule">
+                            <div id="airline_tab" class="tab-pane">
+                                <table class="table table-sm" id="airline_table">
+                                    <thead class="bg-100">
+                                        <tr>
+                                            <th class="text-left">Airline</th>
+                                            <th class="text-left">Departure Date</th>
+                                            <th class="text-left">Departure City</th>
+                                            <th class="text-left">Arrival City</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="package_tbody">
+                                        <t t-foreach="airline_line" t-as="airline">
+                                            <tr>
+                                                <td>
+                                                    <span t-field="airline.name.name" />
+                                                </td>
+                                                <td>
+                                                    <span t-field="airline.departure_date" />
+                                                </td>
+                                                <td>
+                                                    <span t-field="airline.departure_city" />
+                                                </td>
+                                                <td>
+                                                    <span t-field="airline.arrival_city" />
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                             <div id="hotel_tab" class="tab-pane active">
+                                <table class="table table-sm" id="hotel_table">
+                                    <thead class="bg-100">
+                                        <tr>
+                                            <th class="text-left">Hotel</th>
+                                            <th class="text-left">Start Date</th>
+                                            <th class="text-left">End Date</th>
+                                            <th class="text-left">City</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="hotel_line" t-as="hotel">
+                                            <tr>
+                                                <td>
+                                                    <span t-field="hotel.name.name" />
+                                                </td>
+                                                <td>
+                                                    <span t-field="hotel.start_date" />
+                                                </td>
+                                                <td>
+                                                    <span t-field="hotel.end_date" />
+                                                </td>
+                                                <td>
+                                                    <span t-field="hotel.city" />
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="jamaah_tab" class="tab-pane">
+                                <table class="table table-sm" id="jamaah_table">
+                                    <thead class="bg-100">
+                                        <tr>
+                                            <th class="text-left">Name</th>
+                                            <th class="text-left">NIK</th>
+                                            <th class="text-left">Gender</th>
+                                            <th class="text-left">Age</th>
+                                            <th class="text-left">Date of Birth</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="package_tbody">
+                                        <t t-foreach="manifest_line" t-as="manifest">
+                                            <tr>
+                                                <td>
+                                                    <span t-if="manifest.title" t-field="manifest.title"/>
+                                                    <span t-field="manifest.name.name" />
+                                                </td>
+                                                <td>
+                                                    <span t-field="manifest.ktp_no" />
+                                                </td>
+                                                <td>
+                                                    <span t-field="manifest.gender" />
+                                                </td>
+                                                <td>
+                                                    <span t-field="manifest.age" />
+                                                </td>
+                                                <td>
+                                                    <span>
+                                                        <span t-field="manifest.place_birth"/>
+                                                        , 
+                                                        <span t-field="manifest.date_birth"/>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="schedule_tab" class="tab-pane">
+                                <table class="table table-sm" id="schedule_table">
+                                    <thead class="bg-100">
+                                        <tr>
+                                            <th class="text-left">Name</th>
+                                            <th class="text-left">Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="schedule_line" t-as="schedule">
+                                            <tr>
+                                                <td>
+                                                    <span t-field="schedule.name" />
+                                                </td>
+                                                <td>
+                                                    <span t-field="schedule.date" />
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </section>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

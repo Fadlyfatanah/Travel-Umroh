@@ -9,7 +9,7 @@
 
         <record id="group_travel_umroh_manager" model="res.groups">
             <field name="name">Travel Umroh / Manager</field>
-            <field name="implied_ids" eval="[(4, ref('xyz_travel_umroh.group_travel_umroh_user'))]"/>
+            <field name="implied_ids" eval="[(4, ref('ff_travel_umroh.group_travel_umroh_user'))]"/>
             <field name="users" eval="[(4, ref('base.user_admin'))]"/>
         </record>
 

@@ -286,7 +286,7 @@
     <field name="inherit_id" ref="stock.view_picking_form"/>
     <field name="arch" type="xml">
       <xpath expr="//header" position="inside">
-        <button name="xyz_travel_umroh.report_delivery_order"
+<button name="ff_travel_umroh.report_delivery_order"
           string="Cetak Bosku"
           type="object"
         />

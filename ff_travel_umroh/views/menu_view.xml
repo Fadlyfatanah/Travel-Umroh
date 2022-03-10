@@ -4,7 +4,7 @@
     <menuitem
     id="travel_umroh_menu"
     name="Travel Umroh"
-    web_icon="xyz_travel_umroh,static/description/icon.png"
+web_icon="ff_travel_umroh,static/description/icon.png"
 />
 
 <menuitem

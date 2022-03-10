@@ -46,7 +46,8 @@
       <field name="res_model">travel.package</field>
       <field name="view_mode">tree,form</field>
       <!-- <field name="view_type">form</field> -->
-      <field name="view_id" ref="xyz_travel_umroh.travel_package_tree"/>
+<field name="view_id" ref="ff_travel_umroh.travel_package_tree"/>
+
     </record>
 
     <record id="action_tree_view_travel_package" model="ir.actions.act_window.view">
