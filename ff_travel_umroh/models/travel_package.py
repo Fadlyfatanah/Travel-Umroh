@@ -110,27 +110,28 @@ class TravelPackage(models.Model):
                     }])
             package.manifest_travel_line = manifest_list
 
-    # 
-    # def action_update(self):
-    #     for package in self:
-    #         manifest_list = [(5, 0, 0)]
-    #         for rec in package.env['sale.order'].search([('package_id', '=', package.id)]):
-    #             for n in rec.manifest_line:
-    #                 manifest_list.append([0, 0, {
-    #                     'gender': ,
-    #                     'pass_name': ,
-    #                     'pass_no': ,
-    #                     'ktp_no': ,
-    #                     'date_birth': ,
-    #                     'place_birth': ,
-    #                     'date_isue': ,
-    #                     'date_exp': ,
-    #                     'imigrasi': ,
-    #                     'age': ,
-    #                     'room_type': ,
-    #                     'agent': self._uid,
-    #                 }])
-    #         package.manifest_line = manifest_list
+    
+    def action_update(self):
+        for package in self:
+            manifest_list = [(5, 0, 0)]
+            for rec in package.env['sale.order'].search([('state', '!=', 'draft'), ('package_id', '=', package.id)]):
+                for n in rec.manifest_line:
+                    manifest_list.append([0, 0, {
+                        'gender': n.gender,
+                        'pass_name': n.pass_name,
+                        'pass_no': n.pass_no,
+                        'ktp_no': n.ktp_no,
+                        'date_birth': n.date_birth,
+                        'place_birth': n.place_birth,
+                        'date_isue': n.date_isue,
+                        'date_exp': n.date_exp,
+                        'imigrasi': n.imigrasi,
+                        'mahram': n.mahram.id,
+                        'age': n.age,
+                        'room_type': n.room_type,
+                        'agent': self._uid,
+                    }])
+            package.manifest_travel_line = manifest_list
 
     
     def action_to_draft(self):
