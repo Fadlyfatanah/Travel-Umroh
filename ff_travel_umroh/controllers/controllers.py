@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import http, _
+from odoo import http, fields, _
 from odoo.http import request
 from odoo.exceptions import AccessError, MissingError
 from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager, get_records_pager
@@ -7,74 +7,54 @@ from odoo.osv import expression
 
 class WebsiteForm(http.Controller):
     @http.route('/pendaftaran/<data>', auth='public', type='http', website=True, csrf=False)
-    def index(self, data, **kw):
-        blood_type = request.env['res.partner']._fields['blood_type'].selection
-        education = request.env['res.partner']._fields['education'].selection
-        gender = request.env['res.partner']._fields['gender'].selection
-        title = request.env['res.partner']._fields['title'].selection
-        
-        marital_status = request.env['res.partner']._fields['marital_status'].selection
-        clothes_size = request.env['res.partner']._fields['clothes_size'].selection
-        
-        value_data_diri = {
-            'blood_type': blood_type,
-            'education': education,
-            'gender': gender,
-            'title': title,
-        }
-
-        value_data_tambahan = {
-            'marital_status': marital_status,
-            'clothes_size': clothes_size,
-        }
+    def index(self, data, records={}, **kw):
+        value = {}
+        records.update(kw)
 
         if data == 'data-diri':
-            return http.request.render('ff_travel_umroh.pendaftaran_data_diri', value_data_diri)
-        # if data == 'data-tambahan':
-        #     return http.request.render('ff_travel_umroh.pendaftaran_data_tambahan', value_data_tambahan)
+            blood_type = request.env['res.partner']._fields['blood_type'].selection
+            education = request.env['res.partner']._fields['education'].selection
+            gender = request.env['res.partner']._fields['gender'].selection
+            title = request.env['res.partner']._fields['title'].selection
+            value.update({
+                'blood_type': blood_type,
+                'education': education,
+                'gender': gender,
+                'title': title,
+            })
+            return http.request.render('ff_travel_umroh.pendaftaran_data_diri', value)
+        if data == 'data-tambahan':
+            marital_status = request.env['res.partner']._fields['marital_status'].selection
+            clothes_size = request.env['res.partner']._fields['clothes_size'].selection
+            value.update({
+                'marital_status': marital_status,
+                'clothes_size': clothes_size,
+            })
+            return http.request.render('ff_travel_umroh.pendaftaran_data_tambahan', value)
         if data == 'data-passport':
             return http.request.render('ff_travel_umroh.pendaftaran_data_passport', {})
         if data == 'data-gambar':
             return http.request.render('ff_travel_umroh.pendaftaran_data_gambar', {})
-
-class WebsiteForm(WebsiteForm):
+        if data == 'result':
+            records.update({
+                # 'parent_id': ,
+                'company_type': 'person',
+            })
+            self._check_field_before_create(records)
+            request.env['res.partner'].sudo().create(records)
+            return http.request.render('ff_travel_umroh.pendaftaran_data_diri', {})
     
-    def insert_record(self, request, model, values, custom, meta=None):
-        if model.model=='res.partner':
-            custom = ''
-            params = request.params
-            values.update({
-                'name': params['name'],
-                'ktp_no': params['ktp_no'],
-                'mobile': params['mobile'],
-                'place_birth': params['place_birth'],
-                'date_birth': params['date_birth'],
-                'street': params['street'],
-                'city': params['city'],
-                'state_id': params['state_id'],
-                'country_id': params['country_id'],
-                'gender': params['gender'],
-                'father_name': params['father_name'],
-                'mother_name': params['mother_name'],
-                'job': params['job'],
-                'pass_no': params['pass_no'],
-                'date_exp': params['date_exp'],
-                'pass_name': params['pass_name'],
-                'date_issue': params['date_issue'],
-                'imigrasi': params['imigrasi'],
-                'pass_img': params['pass_img'],
-                'ktp_img': params['ktp_img'],
-                'doc_img': params['doc_img'],
-                'kk_img': params['kk_img'],
-                'title': params['title'],
-                'marital_status': params['marital_status'],
-                'blood_type': params['blood_type'],
-                'education': params['education'],
-                'clothes_size': params['clothes_size'],
-                'type': params['opportunity'],
-                })
-        
-        return super(WebsiteForm, self).insert_record(request, model, values, custom, meta=meta)       
+    def _check_field_before_create(self, res):
+        Model = request.env['res.partner']
+        for key in res:
+            if key not in Model._fields:
+                continue
+            elif isinstance(Model._fields[key], fields.Many2one):
+                res[key] = int(res[key])
+            elif isinstance(Model._fields[key], fields.Selection):
+                if isinstance(res[key], dict) and "value" in res[key]:
+                    res[key] = res[key]["value"]
+        return res
 
 class CustomerPortal(CustomerPortal):
 
