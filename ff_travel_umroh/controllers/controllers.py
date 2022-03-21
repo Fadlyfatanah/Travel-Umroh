@@ -29,7 +29,7 @@ class WebsiteForm(http.Controller):
         }
 
         if data == 'data-diri':
-            return http.request.render('ff_travel_umroh.pendaftaran', value_data_diri)
+            return http.request.render('ff_travel_umroh.pendaftaran_data_diri', value_data_diri)
         # if data == 'data-tambahan':
         #     return http.request.render('ff_travel_umroh.pendaftaran_data_tambahan', value_data_tambahan)
         if data == 'data-passport':

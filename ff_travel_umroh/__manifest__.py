@@ -26,6 +26,7 @@
         'security/security.xml',
         'security/ir.model.access.csv',
         'data/ir_sequence_travel_package.xml',
+        'report/travel_package_report.xml',
         'views/css_ff_travel_umroh.xml',
         'views/views.xml',
         'views/action_view.xml',

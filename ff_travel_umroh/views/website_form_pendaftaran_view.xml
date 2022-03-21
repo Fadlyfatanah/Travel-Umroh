@@ -1,6 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="pendaftaran" name="Pendaftaran">
+    <!-- <template id="pendaftaran" name="Pendaftaran">
+        <t t-call="website.layout">
+            <div id="wrap" class="container">
+                <div id="pendaftaran">
+                    <section class="s_website_form">
+                        <div class="container col-md-8">
+                            <form id="pendaftaran_travel_form" action="/website_form/" method="post" class="o_mark_required" enctype="multipart/form-data" data-model_name="sale.order" data-success-mode="redirect">
+                                <div class="form-group row form-field o_website_form_required_custom">
+                                    <div class="col-lg-3 col-md-4 text-right">
+                                        <label class="col-form-label" for="package_id">Travel Package </label>
+                                    </div>
+                                    <div class="col-sm">
+                                        <select name="package_id" class="form-control">
+                                            <option>Package</option>
+                                            <t t-foreach="package_id" t-as="package">
+                                                <option t-att-value="package.id">
+                                                    <t t-esc="package.name"/>
+                                                </option>
+                                            </t>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row form-field o_website_form_required_custom">
+                                    <div class="col-lg-3 col-md-4 text-right">
+                                        <label class="col-form-label" for="package_id">Travel Package</label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-8">
+                                        <input type="text" class="form-control o_website_form_input" name="package_id" required=""/>
+                                    </div>
+                                </div>
+                                <div class="form-group col-12 s_website_form_submit" data-name="Submit Button">
+                                    <div style="width: 200px;" class="s_website_form_label"/>
+                                    <a href="#" role="button" class="btn btn-primary btn-lg s_website_form_send">Submit</a>
+                                    <span id="s_website_form_result"></span>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </t>
+    </template> -->
+
+    <template id="pendaftaran_data_diri" name="Data-Diri">
         <t t-call="website.layout">
             <div id="wrap" class="container">
                 <div id="pendaftaran_data_diri">
