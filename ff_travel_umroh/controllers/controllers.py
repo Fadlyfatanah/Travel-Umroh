@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from crypt import methods
 from odoo import http, _
 from odoo.http import request
 from odoo.exceptions import AccessError, MissingError
@@ -6,12 +7,12 @@ from odoo.addons.portal.controllers.portal import CustomerPortal, pager as porta
 from odoo.osv import expression
 
 class WebsiteForm(http.Controller):
-    @http.route('/pendaftaran/<data>', auth='public', type='http', website=True, csrf=False)
+    @http.route('/pendaftaran/<data>', auth='public', type='http', methods='POST', website=True, csrf=False)
     def index(self, data, **kw):
         blood_type = request.env['res.partner']._fields['blood_type'].selection
         education = request.env['res.partner']._fields['education'].selection
         gender = request.env['res.partner']._fields['gender'].selection
-        title = request.env['res.partner']._fields['title'].selection
+        title_name = request.env['res.partner']._fields['title'].selection
         
         marital_status = request.env['res.partner']._fields['marital_status'].selection
         clothes_size = request.env['res.partner']._fields['clothes_size'].selection
@@ -20,7 +21,7 @@ class WebsiteForm(http.Controller):
             'blood_type': blood_type,
             'education': education,
             'gender': gender,
-            'title': title,
+            'title_name': title_name,
         }
 
         value_data_tambahan = {
@@ -29,9 +30,9 @@ class WebsiteForm(http.Controller):
         }
 
         if data == 'data-diri':
-            return http.request.render('ff_travel_umroh.pendaftaran', value_data_diri)
-        # if data == 'data-tambahan':
-        #     return http.request.render('ff_travel_umroh.pendaftaran_data_tambahan', value_data_tambahan)
+            return http.request.render('ff_travel_umroh.pendaftaran_data_diri', value_data_diri)
+        if data == 'data-tambahan':
+            return http.request.render('ff_travel_umroh.pendaftaran_data_tambahan', value_data_tambahan)
         if data == 'data-passport':
             return http.request.render('ff_travel_umroh.pendaftaran_data_passport', {})
         if data == 'data-gambar':
