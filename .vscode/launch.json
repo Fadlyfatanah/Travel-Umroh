@@ -12,12 +12,10 @@
             "request": "launch",
             "console": "integratedTerminal",
             "python": "/usr/bin/python3", // cari dengan which python3
-            "program": "/home/fadly/odoo/odoo-14.0/odoo-server",
+            "program": "/home/fadly/odoo/odoo-14.0/odoo-bin",
             "args": [
                 "--config=/home/fadly/odoo/conf/odoo-xyz-travel-umroh.conf",
-                "--database=v14-fftravelumroh",
-                // "--update=purchase_conversion_uom"
-                // "--update=asb_update_sale_order"
+                "--database=v14-fftravel",
                 "--update=ff_travel_umroh"
             ]
         },

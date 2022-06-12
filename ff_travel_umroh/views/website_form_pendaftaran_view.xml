@@ -1,12 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    
+    <template id="pendaftaran" name="Pendaftaran">
+        <t t-call="website.layout">
+            <div id="wrap" class="container">
+                <div id="pendaftaran">
+                    <section class="s_website_form">
+                        <div class="container col-md-8">
+                            <form id="pendaftaran_jamaah_form" action="/pendaftaran" method="post" class="o_mark_required" enctype="multipart/form-data" data-model_name="sale.order" data-success-mode="redirect">
+                                <div class="col col-12" string="Personal Data">
+                                    <div class="table-responsive col-12 mb-4">
+                                        <table class="table-sm table-hover">
+                                            <tbody>
+                                                <tr>
+                                                    <th class="col-lg-3 col-md-4 text-right">
+                                                        <label class="col-form-label" for="package_id">Travel Package </label>
+                                                    </th>
+                                                    <td>
+                                                        <div class="col-sm">
+                                                            <select name="package_id" class="form-control">
+                                                                <option value="" selected="" disabled="">Package</option>
+                                                                <t t-foreach="package_id" t-as="package">
+                                                                    <option t-att-value="package.id">
+                                                                        <t t-esc="package.name"/>
+                                                                    </option>
+                                                                </t>
+                                                            </select>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="col-lg-3 col-md-4 text-right">
+                                                        <label class="col-form-label" for="room_type">Room Type </label>
+                                                    </th>
+                                                    <td>
+                                                        <div class="col-sm">
+                                                            <select name="room_type" class="form-control">
+                                                                <option value="" selected="" disabled="">Room Type</option>
+                                                                <t t-foreach="room_type" t-as="type">
+                                                                    <option t-att-value="type[0]">
+                                                                        <t t-esc="type[1]"/>
+                                                                    </option>
+                                                                </t>
+                                                            </select>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="col-lg-3 col-md-4 text-right">
+                                                        <label class="col-form-label" for="jamaah_count">Jamaah Count </label>
+                                                    </th>
+                                                    <td>
+                                                        <div class="col-sm">
+                                                            <input type="number" id="jamaah_count" name="jamaah_count" class="o_input o_product_qty form-control text-right" value="0" min="1" onchange="createTable(this)"/>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div id="demo"></div>
+                                    <div class="o_field_one2many o_field_widget o_field_x2many o_field_x2many_list">
+                                        <div class="o_list_view" id="table_manifest">
+                                            <div class="table-responsive">
+                                                <table class="o_list_table table table-sm table-hover table-striped o_list_table_ungrouped">
+                                                    <thead id="thead"></thead>
+                                                    <tbody id="tbody" class="ui-sortable"></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- <script type="text/javascript" src="/ff_travel_umroh/static/src/js/domain_jamaah.js"/> -->
+                                    <script type="text/javascript" src="/ff_travel_umroh/static/src/js/manifest_line_jamaah.js"/> 
+                                </div>
+                                <div class="form-group row">
+                                    <div class="offset-lg-3 offset-md-4 col-md-8 col-lg-7">
+                                        <a id="add" class="btn btn-primary btn-lg o_website_form_send" href="/pendaftaran/data-diri">Add Jamaah</a>
+                                        <button id="next" type="submit" class="btn btn-primary btn-lg o_website_form_send">Next</button>
+                                        <button id="back" type="submit" class="btn btn-secondary btn-lg d-none">Back</button>
+                                        <button id="submit" class="btn btn-primary btn-lg o_website_form_send d-none">Submit</button>
+                                        <span id="o_website_form_result"></span>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </t>
+    </template>
+
     <template id="pendaftaran_data_diri" name="Data Diri">
         <t t-call="website.layout">
             <div id="wrap" class="container">
                 <div id="pendaftaran_data_diri">
                     <section class="s_website_form">
                         <div class="container col-md-8">
-                            <form id="pendaftaran_jamaah_data_diri_form" action="/pendaftaran/data-diri" method="post" class="o_mark_required" enctype="multipart/form-data" data-model_name="res.partner" data-success-mode="redirect">
+                            <form id="pendaftaran_jamaah_data_diri_form" action="/pendaftaran/data-tambahan" method="post" class="o_mark_required" enctype="multipart/form-data" data-model_name="res.partner" data-success-mode="redirect">
                                 <div class="s_website_form_rows row s_col_no_bgcolor" string="Personal Data">
                                     <div class="form-group col-12 s_website_form_field s_website_form_required s_website_form_model_required" data-type="char" data-name="Field">
                                         <div class="form-group row form-field o_website_form_required_custom">
@@ -15,6 +105,21 @@
                                             </div>
                                             <div class="col-sm">
                                                 <input id="name" type="text" class="form-control o_website_form_input" name="name" required=""/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row form-field o_website_form_required_custom">
+                                            <div class="col-lg-3 col-md-4 text-right">
+                                                <label class="col-form-label" for="name">Title </label>
+                                            </div>
+                                            <div class="col-sm">
+                                                <select name="title_person" class="form-control">
+                                                    <option value="" selected="" disabled="">Title</option>
+                                                    <t t-foreach="title_person" t-as="title">
+                                                        <option t-att-value="title[0]">
+                                                            <t t-esc="title[1]"/>
+                                                        </option>
+                                                    </t>
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="form-group row form-field o_website_form_required_custom">
@@ -59,7 +164,7 @@
                                                 </div>
                                                 <div class="row" style="margin-bottom: 1rem;">
                                                     <div class="col-sm">
-                                                        <select name="city_id" class="form-control">
+                                                        <select id="txt_kota" name="city_id" class="form-control">
                                                             <option value="" selected="" disabled="">City</option>
                                                             <t t-foreach="request.env['res.state.city'].sudo().search([])" t-as="city">
                                                                 <option t-att-value="city.id">
@@ -69,7 +174,7 @@
                                                         </select>
                                                     </div>
                                                     <div class="col-sm">
-                                                        <select name="state_id" class="form-control">
+                                                        <select id="txt_provinsi" name="state_id" class="form-control" onchange="pilihKota()">
                                                             <option value="" selected="" disabled="">State</option>
                                                             <t t-foreach="request.env['res.country.state'].sudo().search([])" t-as="state">
                                                                 <option t-att-value="state.id">
@@ -80,7 +185,7 @@
                                                     </div>
                                                 </div>
                                                 <div style="margin-bottom: 1rem;">
-                                                    <select name="country_id" class="form-control">
+                                                    <select id="txt_negara" name="country_id" class="form-control" onchange="pilihProvinsi()">
                                                         <option value="" selected="" disabled="">Country</option>
                                                         <t t-foreach="request.env['res.country'].sudo().search([])" t-as="country">
                                                             <option t-att-value="country.id">
@@ -141,7 +246,7 @@
                                 </div>
                                 <div class="form-group row">
                                     <div class="offset-lg-3 offset-md-4 col-md-8 col-lg-7">
-                                        <a href="/pendaftaran/data-tambahan" role="button" class="btn btn-primary btn-lg o_website_form_send">Next</a>
+                                        <button type="submit" class="btn btn-primary btn-lg o_website_form_send">Next</button>
                                         <span id="o_website_form_result"></span>
                                     </div>
                                 </div>
@@ -216,7 +321,7 @@
                                 </div>
                                 <div class="form-group row">
                                     <div class="offset-lg-3 offset-md-4 col-md-8 col-lg-7">
-                                        <a href="/pendaftaran/data-passport" role="button" class="btn btn-primary btn-lg o_website_form_send">Next</a>
+                                        <button type="submit" class="btn btn-primary btn-lg o_website_form_send">Next</button>
                                         <span id="o_website_form_result"></span>
                                     </div>
                                 </div>
@@ -275,7 +380,7 @@
                         </div>
                         <div class="form-group row">
                             <div class="offset-lg-3 offset-md-4 col-md-8 col-lg-7">
-                                <a href="/pendaftaran/data-gambar" role="button" class="btn btn-primary btn-lg o_website_form_send">Next</a>
+                                <button type="submit" class="btn btn-primary btn-lg o_website_form_send">Next</button>
                                 <span id="o_website_form_result"></span>
                             </div>
                         </div>
@@ -289,7 +394,7 @@
         <t t-call="website.layout">
             <section class="s_website_form">
                 <div class="container col-md-8">
-                    <form id="pendaftaran_jamaah_data_gambar_form" action="/pendaftaran/data-gambar" method="post" class="o_mark_required" enctype="multipart/form-data" data-model_name="res.partner" data-success-mode="redirect">
+                    <form id="pendaftaran_jamaah_data_gambar_form" action="/pendaftaran/result/respartner" method="post" class="o_mark_required" enctype="multipart/form-data" data-model_name="res.partner" data-success-mode="redirect">
                         <div class="col-lg-10 col-md-18 text-right">
                             <label class="col-lg-3 col-md-4">Image Max 2MB</label>
                         </div>
@@ -342,7 +447,7 @@
                         </script>
                         <div class="form-group row">
                             <div class="offset-lg-3 offset-md-4 col-md-8 col-lg-7">
-                                <a href="#" role="button" class="btn btn-primary btn-lg o_website_form_send">Submit</a>
+                                <button type="submit" class="btn btn-primary btn-lg o_website_form_send">Submit</button>
                                 <span id="o_website_form_result"></span>
                             </div>
                         </div>

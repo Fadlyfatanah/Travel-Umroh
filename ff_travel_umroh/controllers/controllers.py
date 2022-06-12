@@ -1,81 +1,135 @@
 # -*- coding: utf-8 -*-
-from crypt import methods
-from odoo import http, _
+from xml.dom.minidom import parse, parseString
+from odoo import http, fields, _
 from odoo.http import request
 from odoo.exceptions import AccessError, MissingError
 from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager, get_records_pager
-from odoo.osv import expression
 
-class WebsiteForm(http.Controller):
-    @http.route('/pendaftaran/<data>', auth='public', type='http', methods='POST', website=True, csrf=False)
-    def index(self, data, **kw):
-        blood_type = request.env['res.partner']._fields['blood_type'].selection
-        education = request.env['res.partner']._fields['education'].selection
-        gender = request.env['res.partner']._fields['gender'].selection
-        title_name = request.env['res.partner']._fields['title'].selection
-        
-        marital_status = request.env['res.partner']._fields['marital_status'].selection
-        clothes_size = request.env['res.partner']._fields['clothes_size'].selection
-        
-        value_data_diri = {
-            'blood_type': blood_type,
-            'education': education,
-            'gender': gender,
-            'title_name': title_name,
-        }
+class TravelUmroh(http.Controller):
+    @http.route(['/pendaftaran', '/pendaftaran/<data>', '/pendaftaran/result/<model>'], auth='public', type='http', website=True, csrf=False)
+    def form_pedaftaran(self, data=False, model=False, records={}, **kwargs):
+        value = {}
+        Partner = request.env['res.partner'].sudo()
+        SaleOrder = request.env['sale.order'].sudo()
+        TravelPackage = request.env['travel.package'].sudo()
+        PaymentTerm = request.env['account.payment.term'].sudo()
+        Product = request.env['product.template'].sudo()
+        User = request.env['res.users'].sudo()
+        uid = request._uid
+        records.update(kwargs)
+        user_id = User.browse(uid)
+        partner_id = user_id.partner_id
+        tempRequest = request.httprequest
+        getAttr = tempRequest.values
 
-        value_data_tambahan = {
-            'marital_status': marital_status,
-            'clothes_size': clothes_size,
-        }
+        # Domain for search jamaah
+        domain = [('company_type', '=', 'person')]
+        if not user_id.has_group('ff_travel_umroh.group_travel_umroh_manager') or data == 'getListMahram':
+            domain.append(('parent_id', '=', partner_id.id))
+        else:
+            domain.append(('parent_id', '!=', False))
 
-        if data == 'data-diri':
-            return http.request.render('ff_travel_umroh.pendaftaran_data_diri', value_data_diri)
-        if data == 'data-tambahan':
-            return http.request.render('ff_travel_umroh.pendaftaran_data_tambahan', value_data_tambahan)
-        if data == 'data-passport':
-            return http.request.render('ff_travel_umroh.pendaftaran_data_passport', {})
-        if data == 'data-gambar':
-            return http.request.render('ff_travel_umroh.pendaftaran_data_gambar', {})
-
-class WebsiteForm(WebsiteForm):
-    
-    def insert_record(self, request, model, values, custom, meta=None):
-        if model.model=='res.partner':
-            custom = ''
-            params = request.params
-            values.update({
-                'name': params['name'],
-                'ktp_no': params['ktp_no'],
-                'mobile': params['mobile'],
-                'place_birth': params['place_birth'],
-                'date_birth': params['date_birth'],
-                'street': params['street'],
-                'city': params['city'],
-                'state_id': params['state_id'],
-                'country_id': params['country_id'],
-                'gender': params['gender'],
-                'father_name': params['father_name'],
-                'mother_name': params['mother_name'],
-                'job': params['job'],
-                'pass_no': params['pass_no'],
-                'date_exp': params['date_exp'],
-                'pass_name': params['pass_name'],
-                'date_issue': params['date_issue'],
-                'imigrasi': params['imigrasi'],
-                'pass_img': params['pass_img'],
-                'ktp_img': params['ktp_img'],
-                'doc_img': params['doc_img'],
-                'kk_img': params['kk_img'],
-                'title': params['title'],
-                'marital_status': params['marital_status'],
-                'blood_type': params['blood_type'],
-                'education': params['education'],
-                'clothes_size': params['clothes_size'],
-                'type': params['opportunity'],
+        if data:
+            if data == 'getListJamaah':
+                listJamaah = getAttr['listJamaah'] if getAttr.get('listJamaah', False) else False
+                domain.append(('id', 'not in', listJamaah))
+                text = "<option value='' selected='' disabled=''>Jamaah</option>"
+                for rec in Partner.sudo().search(domain):
+                    text = text + "<option value='"+str(rec.id)+"'>"+str(rec.name)+"</option>"
+                return text
+            elif data == 'getListMahram':
+                jamaah_id = int(getAttr['jamaah_id']) if getAttr.get('jamaah_id', False) else False
+                domain.append(('id', '!=', jamaah_id))
+                jamaah_ids = Partner.search(domain)
+                text = "<option value='' selected='' disabled=''>Mahram</option>"
+                for rec in jamaah_ids:
+                    text = text + "<option value='"+str(rec.id)+"'>"+str(rec.name)+"</option>"
+                return text
+            elif data == 'getDetailJamaah':
+                tempRequest = request.httprequest
+                getAttr = tempRequest.values
+                int_id = int(getAttr['jamaah_id']) if getAttr.get('jamaah_id', False) else False
+                data = {}
+                if int_id:
+                    jamaah = Partner.browse(int_id)
+                    today = fields.Date.today()
+                    born = jamaah.date_birth
+                    age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
+                    gender = dict(jamaah._fields['gender'].selection).get(jamaah.gender)
+                    text = "<jamaah><div name='ktp_no'>"+str(jamaah.ktp_no)+"</div><div name='gender'>"\
+                        +str(gender)+"</div><div name='age'>"+str(age)+"</div></jamaah>"
+                return text
+                # return xml_doc.write(file)
+            elif data == 'data-diri':
+                blood_type = Partner._fields['blood_type'].selection
+                education = Partner._fields['education'].selection
+                gender = Partner._fields['gender'].selection
+                title_person = Partner._fields['title'].selection
+                value.update({
+                    'blood_type': blood_type,
+                    'education': education,
+                    'gender': gender,
+                    'title_person': title_person,
                 })
-        
-        return super(WebsiteForm, self).insert_record(request, model, values, custom, meta=meta)       
+                return http.request.render('ff_travel_umroh.pendaftaran_data_diri', value)
+            elif data == 'data-tambahan':
+                marital_status = Partner._fields['marital_status'].selection
+                clothes_size = Partner._fields['clothes_size'].selection
+                value.update({
+                    'marital_status': marital_status,
+                    'clothes_size': clothes_size,
+                })
+                return http.request.render('ff_travel_umroh.pendaftaran_data_tambahan', value)
+            elif data == 'data-passport':
+                return http.request.render('ff_travel_umroh.pendaftaran_data_passport', {})
+            elif data == 'data-gambar':
+                return http.request.render('ff_travel_umroh.pendaftaran_data_gambar', {})
+            elif data == 'result':
+                if model == 'respartner':
+                    records.update({
+                        'parent_id': uid,
+                        'company_type': 'person',
+                    })
+                    self._check_field_before_create(records)
+                    Partner.sudo().create(records)
+                    return http.request.render('ff_travel_umroh.pendaftaran', {})
+                elif model == 'saleorder':
+                    value.update({
+                        'state': 'sale',
+                        'partner_id': uid,
+                        # 'package_id': ,
+                    })
+                    SaleOrder.sudo().create(value)
+                    # return http.request.render('ff_travel_umroh.so', {})
+
+        else:
+            package_id = TravelPackage.search([('state', '=', 'confirm')])
+            jamaah_id = Partner.search([('company_type', '=', 'person'), ('parent_id', '=', uid)])
+            product_id = Product.search([('type', '=', 'service')])
+            title_person = Partner._fields['title'].selection
+            room_type = request.env['manifest.lines']._fields['room_type'].selection
+            value.update({
+                'package_id': package_id,
+                'jamaah_id': jamaah_id,
+                'product_id': product_id,
+                'title_person': title_person,
+                'room_type': room_type,
+                'manifest_line': SaleOrder.manifest_line
+            })
+            return http.request.render('ff_travel_umroh.pendaftaran', value)
+            
+    
+    def _check_field_before_create(self, res):
+        Model = request.env['res.partner']
+        for key in res:
+            if key not in Model._fields:
+                continue
+            elif isinstance(Model._fields[key], fields.Many2one):
+                res[key] = int(res[key])
+            elif isinstance(Model._fields[key], fields.Selection):
+                if isinstance(res[key], dict) and "value" in res[key]:
+                    res[key] = res[key]["value"]
+        return res
 
 class CustomerPortal(CustomerPortal):
 
@@ -188,3 +242,35 @@ class CustomerPortal(CustomerPortal):
         values = self._package_get_page_view_values(package_sudo, access_token, **kw)
         
         return request.render("ff_travel_umroh.portal_my_package", values)
+
+class GetDropDown(http.Controller):
+    @http.route('/pendaftaran/data-diri/getnegara', auth="public", type="http", csrf=False)
+    def getnegara(self, **values):
+        text = "<option value=''>-Pilih Negara-</option>"
+        for pr in request.env['res.country'].sudo().search([]):
+            text = text + "<option value='"+str(pr.id)+"'>"+str(pr.name)+"</option>"
+        return text
+    
+    @http.route('/pendaftaran/data-diri/getNegarasubProvinsi', auth="public", type="http", csrf=False)
+    def getNegarasubProvinsi(self, **values):
+        tempRequest = request.httprequest
+        getAttr = tempRequest.values
+        idNegara = getAttr.get('negara',False)
+        getProvinsi = request.env['res.country.state'].sudo()
+        baris = getProvinsi.search([('country_id','=',int(idNegara))])
+        text = "<option value=''>-Pilih Provinsi-</option>"
+        for ll in baris:
+            text = text + "<option value='"+str(ll.id)+"'>"+str(ll.name)+"</option>"
+        return text
+    
+    @http.route('/pendaftaran/data-diri/getNegarasubProvinsisubKota', auth="public", type="http", csrf=False)
+    def getNegarasubProvinsisubKota(self, **values):
+        tempRequest = request.httprequest
+        getAttr = tempRequest.values
+        idprovinsi = getAttr.get('provinsi',False)
+        getKota = request.env['res.state.city'].sudo()
+        baris = getKota.search([('state_id','=',int(idprovinsi))])
+        text = "<option value=''>-Pilih Kota/Kabupaten-</option>"
+        for ll in baris:
+            text = text + "<option value='"+str(ll.id)+"'>"+str(ll.name)+"</option>"
+        return text

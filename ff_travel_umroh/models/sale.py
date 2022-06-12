@@ -22,3 +22,8 @@ class SaleOrder(models.Model):
                 'product_uom': 1
             }])
             rec.order_line = order_list
+
+    def dataManifestLine(self):
+        output = {}
+        output['ids'] = [1,2,4,6]
+        return output

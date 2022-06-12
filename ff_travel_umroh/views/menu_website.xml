@@ -3,7 +3,7 @@
 
     <record id="menu_pendaftaran" model="website.menu">
         <field name="name">Pendaftaran</field>
-        <field name="url">/pendaftaran/data-diri</field>
+        <field name="url">/pendaftaran</field>
         <field name="parent_id" ref="website.main_menu"/>
         <field name="sequence" type="int">50</field>
     </record>

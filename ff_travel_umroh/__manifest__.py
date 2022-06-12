@@ -26,14 +26,19 @@
         'security/security.xml',
         'security/ir.model.access.csv',
         'data/ir_sequence_travel_package.xml',
+        'report/travel_package_report.xml',
         'views/css_ff_travel_umroh.xml',
         'views/views.xml',
         'views/action_view.xml',
+        'views/assets.xml',
         'views/menu_view.xml',
         'views/menu_website.xml',
         'views/sale_portal_templates.xml',
         'views/travel_portal_templates.xml',
         'views/website_form_pendaftaran_view.xml',
+    ],
+    'qweb': [
+        "/static/src/xml/counter.xml",
     ],
     # only loaded in demonstration mode
     'demo': [
