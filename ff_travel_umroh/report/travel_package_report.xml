@@ -127,7 +127,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="package_tbody">
-                                    <t t-foreach="package.manifest_travel_line" t-as="manifest">
+                                    <t t-foreach="package.manifest_line" t-as="manifest">
                                         <tr>
                                             <td>
                                                 <span t-field="manifest.pass_name" />

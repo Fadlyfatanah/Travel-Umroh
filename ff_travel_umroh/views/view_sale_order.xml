@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <record id="sale_order_umrah_view_form" model="ir.ui.view">
+    <field name="name">sale.order.umrah.view.form</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_order_form" />
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='partner_id']" position="after">
+        <field name="package_id" domain="[('state', '=', 'open')]"/>
+      </xpath>
+      <xpath expr="//page[@name='order_lines']//tree//field[@name='product_id']" position="attributes">
+        <attribute name="context">{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'company_id': parent.company_id, 'package_ok': False}</attribute>
+        <attribute name="domain">[('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id), ('package_ok', '=', False)]</attribute>
+      </xpath>
+      <xpath expr="//notebook" position="inside">
+        <page string="Manifest">
+          <field name="manifest_line">
+            <tree>
+              <field name="title" />
+              <field name="name" />
+              <field name="gender" />
+              <field name="pass_name" />
+              <field name="pass_no" />
+              <field name="ktp_no" />
+              <field name="date_birth" />
+              <field name="place_birth" />
+              <field name="date_isue" />
+              <field name="date_exp" />
+              <field name="imigrasi" />
+              <field name="age" force_save="1" />
+              <field name="room_type" />
+              <field name="mahram" />
+            </tree>
+            <form>
+              <sheet>
+                <group string="Personal">
+                  <group>
+                    <field name="name" domain="[('jamaah', '=', True)]"/>
+                    <field name="ktp_no" readonly="1" />
+                    <field name="place_birth" readonly="1" />
+                    <field name="room_type" />
+                  </group>
+                  <group>
+                    <field name="title" />
+                    <field name="date_birth" readonly="1" />
+                    <field name="age" force_save="1" readonly="1" />
+                    <field name="mahram" domain="[('jamaah', '=', True)]"/>
+                  </group>
+                </group>
+                <group string="Passport">
+                  <group>
+                    <field name="pass_no" readonly="1" />
+                    <field name="date_isue" readonly="1" />
+                    <field name="imigrasi" readonly="1" />
+                  </group>
+                  <group>
+                    <field name="pass_name" readonly="1" />
+                    <field name="date_exp" readonly="1" />
+                    <field name="notes" />
+                  </group>
+                </group>
+              </sheet>
+            </form>
+          </field>
+        </page>
+      </xpath>
+    </field>
+  </record>
+
+</odoo>

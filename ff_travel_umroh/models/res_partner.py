@@ -5,6 +5,8 @@ class Partner(models.Model):
 
     airlines = fields.Boolean(string='Airlines ?')
     hotel = fields.Boolean(string='Hotel ?')
+    jamaah = fields.Boolean(string='Jamaah ?')
+    muthawif = fields.Boolean(string='Muthawif ?')
     ktp_no = fields.Char(string='KTP No')
     father_name = fields.Char(string='Father\'s Name')
     job = fields.Char(string='Job')
@@ -21,13 +23,6 @@ class Partner(models.Model):
     doc_img = fields.Binary(string='Buku Nikah / Akta Lahir')
     kk_img = fields.Binary(string='Kartu Keluarga')
     country_id = fields.Many2one('res.country', string='Country')
-    title = fields.Selection([
-        ('mr', 'Mister'),
-        ('miss', 'Miss'),
-        ('doctor', 'Doctor'),
-        ('madam', 'Madam'),
-        ('prof', 'Professor')
-    ], string='Title')
     marital_status = fields.Selection([
         ('single', 'Single'),
         ('married', 'Married'),

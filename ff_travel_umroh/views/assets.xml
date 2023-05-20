@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?> 
-<odoo> 
-    <template id="assets_frontend_inherit" inherit_id="web.assets_frontend"> 
-        <xpath expr="." position="inside"> 
-            <script src="/ff_travel_umroh/static/src/js/manifest_line_jamaah.js"/> 
-        </xpath> 
-    </template> 
-</odoo> 
