@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Load css File -->
+        <template id="css_ff_travel_umroh" name="css_ff_travel_umroh assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <link rel="stylesheet" href="/ff_travel_umroh/static/src/css/custom.css"/>
+            </xpath>
+        </template>
+    </data>
+</odoo>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="ff_travel_umroh_portal.assets" name="ff_travel_umroh_portal_assets">
+        <script type="text/javascript" src="/ff_travel_umroh_portal/static/src/js/testing.js"/>
+    </template>
+
+    <template id="ff_travel_umroh_portal.assets_common" name="Travel Assets Common">
+        <t t-call-assets="ff_travel_umroh_portal.assets" t-js="false" />
+    </template>
+
+</odoo>

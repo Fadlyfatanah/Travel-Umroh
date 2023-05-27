@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="wizard_checkout_inherit" inherit_id="website_sale.wizard_checkout">
+        <xpath expr="//div/div/div/div/a[2]" position="replace">
+            <a class="no-decoration" t-att-href="step&gt;=20 and '/shop/jamaah' or '#'">
+                <div id="wizard-step20" t-att-class="'progress-wizard-step %s' % (step == 20 and 'active' or step&gt;20 and 'complete' or 'disabled')">
+                <div class="progress-wizard-bar d-none d-md-block"/>
+                <span class="progress-wizard-dot d-none d-md-inline-block"></span>
+                <div class="text-center progress-wizard-steplabel">Jamaah</div>
+                </div>
+            </a>
+        </xpath>
+    </template>
+
+    <template id="jamaah_kanban" name="Kanban jamaah">
+        <form action="/shop/jamaah" method="POST" class="d-none">
+            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+            <input type="hidden" name="partner_id" t-att-value="contact.id" />
+            <input type='submit'/>
+        </form>
+        <div t-attf-class="card #{selected and 'border border-primary'}">
+            <div class='card-body' style='min-height: 70px;'>
+                <a href="/shop/jamaah/register" class="btn btn-link float-right p-0 no-decoration" role="button" title="Edit this jamaah" aria-label="Edit this jamaah"><i class='fa fa-edit'/></a>
+                <!-- <a href="#" onclick="deleteManifest(this)" class="btn btn-link float-right p-0 no-decoration" role="button" title="Edit this jamaah" aria-label="Edit this jamaah"><i class='fa fa-edit'/></a> -->
+                <t t-esc="contact" t-options="dict(widget='contact', fields=['name', 'ktp_no', 'phone'], no_marker=False)"/>
+            </div>
+            <script type="text/javascript" src="/ff_travel_umroh_portal/static/src/js/WebsiteSale.js" />
+        </div>
+    </template>
+
+    <template id="jamaah" name="Jamaah Management">
+        <t t-call="website.layout">
+            <t t-set="additional_title">Jamaah</t>
+            <t t-set="no_footer" t-value="1"/>
+            <div id="wrap">
+                <div class="container oe_website_sale py-2">
+                    <div class="row">
+                        <div class="col-12">
+                            <t t-call="website_sale.wizard_checkout">
+                                <t t-set="step" t-value="20" />
+                            </t>
+                        </div>
+                        <div class="col-12 col-xl-auto order-xl-2 d-none d-xl-block">
+                            <t t-call="website_sale.cart_summary">
+                                <t t-set="redirect" t-valuef="/shop/jamaah"/>
+                            </t>
+                        </div>
+                        <div class="col-12 col-xl order-xl-1 oe_cart">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <h3 class="o_page_header mt8">Jamaah List</h3>
+                                </div>
+                                <t t-foreach="website_sale_order.manifest_line" t-as="manifest">
+                                    <div class="col-lg-12 one_kanban">
+                                        <t t-call="ff_travel_umroh_portal.jamaah_kanban">
+                                            <t t-set='contact' t-value="manifest.name"/>
+                                            <t t-set='selected' t-value="1"/>
+                                            <t t-set='readonly' t-value="1"/>
+                                        </t>
+                                    </div>
+                                </t>
+                            </div>
+                            <div class="d-flex justify-content-between mt-3">
+                                <a role="button" href="/shop/cart" class="btn btn-secondary mb32">
+                                    <i class="fa fa-chevron-left"/>
+                                    <span>Return to Cart</span>
+                                </a>
+                                <a role="button" href="/shop/jamaah/selection" class="btn btn-secondary mb32">
+                                    <i class="fa fa-plus-square"/>
+                                    <span>Add Jamaah</span>
+                                </a>
+                                <a role="button" href="/shop/confirm_order" class="btn btn-primary mb32">
+                                    <span>Confirm</span>
+                                    <i class="fa fa-chevron-right"/>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="jamaah_selection" name="Jamaah Selection">
+        <t t-set="no_footer" t-value="1"/>
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="container oe_website_sale py-2">
+                    <div class="row">
+                        <!-- <div class="col-12 col-xl-auto order-xl-2 d-none d-xl-block">
+                            <t t-call="website_sale.cart_summary">
+                                <t t-set="redirect" t-valuef="/shop/jamaah/selection"/>
+                            </t>
+                        </div> -->
+                        <div class="col-12 col-xl order-xl-1 oe_cart">
+                            <div>
+                                <h2 class="o_page_header mt8">Select Jamaah</h2>
+                                <form role="form" action="/shop/jamaah/selection/add" method="post" class="checkout_autoformat">
+                                    <div id="selection_div" class="form-row"></div>
+                                    <div class="d-flex justify-content-between">
+                                        <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+                                    </div>
+                                </form>
+                                <script>
+                                    function getSelection(idRow) {
+                                        let xhttp = new XMLHttpRequest();
+                                        xhttp.onreadystatechange =
+                                            function () {
+                                            if (this.readyState == 4) {
+                                                if (this.status == 200) {
+                                                respon = xhttp.responseText;
+                                                let row = document.getElementById(idRow);
+                                                row.innerHTML = respon;
+                                                }
+                                            }
+                                            };
+                                        let alamat = "/shop/jamaah/selection/list"
+                                        xhttp.open("GET", alamat, true);
+                                        xhttp.send();
+                                    }
+                                    getSelection("selection_div");
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="jamaah_register" name="Jamaah Register">
+        <t t-set="no_footer" t-value="1"/>
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="container oe_website_sale py-2">
+                    <div class="row">
+                        <div class="col-12">
+                            <t t-call="website_sale.wizard_checkout">
+                                <t t-set="step" t-value="20" />
+                            </t>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-xl-auto order-xl-2 d-none d-xl-block">
+                            <t t-call="website_sale.cart_summary">
+                                <t t-set="redirect" t-valuef="/shop/jamaah/register"/>
+                            </t>
+                        </div>
+                        <div class="col-12 col-xl order-xl-1 oe_cart">
+                            <div>
+                                <h2 class="o_page_header mt8">Jamaah Information</h2>
+                                <t t-if="error" t-foreach="error.get('error_message', [])" t-as="err">
+                                    <h5 class="text-danger" t-esc="err" />
+                                </t>
+                                <form role="form" action="/shop/jamaah/register/add" method="post" class="checkout_autoformat">
+                                    <div class="form-row">
+                                        <div t-attf-class="form-group #{error.get('name') and 'o_has_error' or ''} col-lg-12 div_name">
+                                            <label class="col-form-label" for="name">Name</label>
+                                            <input id="name" type="text" class="form-control o_website_form_input" name="name" required="" t-att-value="'name' in jamaah and jamaah['name']" />
+                                        </div>
+                                        <div class="w-100"/>
+                                        <div t-attf-class="form-group #{error.get('ktp_no') and 'o_has_error' or ''} col-lg-12 div_ktp_no">
+                                            <label class="col-form-label" for="ktp_no">KTP No</label>
+                                            <input id="ktp_no" type="number" class="form-control" name="ktp_no" required="" t-att-value="'ktp_no' in jamaah and jamaah['ktp_no']" />
+                                        </div>
+                                        <div class="w-100"/>
+                                        <div t-attf-class="form-group #{error.get('place_birth') and 'o_has_error' or ''} col-lg-12 div_place_birth">
+                                            <label class="col-form-label" for="place_birth">Place of Birth </label>
+                                            <input id="place_birth" type="text" class="form-control" name="place_birth" required="" t-att-value="'place_birth' in jamaah and jamaah['place_birth']" />
+                                        </div>
+                                        <div class="w-100"/>
+                                        <div t-attf-class="form-group #{error.get('date_birth') and 'o_has_error' or ''} col-lg-12 div_date_birth">
+                                            <label class="col-form-label" for="date_birth">Date of Birth </label>
+                                            <input id="date_birth" type="date" class="form-control" name="date_birth" required="" t-att-value="'date_birth' in jamaah and jamaah['date_birth']" />
+                                        </div>
+                                        <div class="w-100"/>
+                                        <div t-attf-class="form-group #{error.get('street') and 'o_has_error' or ''} col-lg-12 div_street">
+                                            <label class="col-form-label" for="street">Street <span class="d-none d-md-inline"> and Number</span></label>
+                                            <input type="text" name="street" t-attf-class="form-control #{error.get('street') and 'is-invalid' or ''}" t-att-value="'street' in jamaah and jamaah['street']" />
+                                        </div>
+                                        <div class="w-100"/>
+                                        <div t-attf-class="form-group #{error.get('street2') and 'o_has_error' or ''} col-lg-12 div_street2">
+                                            <label class="col-form-label label-optional" for="street2">Street 2</label>
+                                            <input type="text" name="street2" t-attf-class="form-control #{error.get('street2') and 'is-invalid' or ''}" t-att-value="'street2' in jamaah and jamaah['street2']" />
+                                        </div>
+                                        <div class="w-100"/>
+                                        <div t-attf-class="form-group #{error.get('city') and 'o_has_error' or ''} col-md-8 div_city">
+                                            <label class="col-form-label" for="city">City</label>
+                                            <input type="text" name="city" t-attf-class="form-control #{error.get('city') and 'is-invalid' or ''}" t-att-value="'city' in jamaah and jamaah['city']" />
+                                        </div>
+                                        <t t-set='zip_city' t-value='country and [x for x in country.get_address_fields() if x in ["zip", "city"]] or ["city", "zip"]'/>
+                                        <t t-if="'zip' in zip_city and zip_city.index('zip') &lt; zip_city.index('city')">
+                                            <div t-attf-class="form-group #{error.get('zip') and 'o_has_error' or ''} col-md-4 div_zip">
+                                                <label class="col-form-label label-optional" for="zip">Zip Code</label>
+                                                <input type="number" name="zip" t-attf-class="form-control #{error.get('zip') and 'is-invalid' or ''}" t-att-value="'zip' in jamaah and jamaah['zip']" />
+                                            </div>
+                                        </t>
+                                        <div class="w-100"/>
+                                        <div t-attf-class="form-group #{error.get('phone') and 'o_has_error' or ''} col-lg-6" id="div_phone">
+                                            <label class="col-form-label" for="phone">Phone</label>
+                                            <input type="tel" name="phone" t-attf-class="form-control #{error.get('phone') and 'is-invalid' or ''}" t-att-value="'phone' in jamaah and jamaah['phone']" />
+                                        </div>
+                                        <div class="w-100"/>
+                                        <div t-attf-class="form-group #{error.get('mobile') and 'o_has_error' or ''} col-lg-6" id="div_mobile">
+                                            <label class="col-form-label" for="mobile">Mobile</label>
+                                            <input type="tel" name="mobile" t-attf-class="form-control #{error.get('mobile') and 'is-invalid' or ''}" t-att-value="'mobile' in jamaah and jamaah['mobile']" />
+                                        </div>
+                                        <div class="w-100"/>
+                                        <div t-attf-class="form-group #{error.get('email') and 'o_has_error' or ''} col-lg-6" id="div_email">
+                                            <label class="col-form-label" for="email">Email</label>
+                                            <input type="email" name="email" t-attf-class="form-control #{error.get('email') and 'is-invalid' or ''}" t-att-value="'email' in jamaah and jamaah['email']" />
+                                        </div>
+                                        <div class="w-100"/>
+                                        <div t-attf-class="form-group #{error.get('title') and 'o_has_error' or ''} col-lg-6" id="div_title">
+                                            <label class="col-form-label" for="title_id">Title</label>
+                                            <select id="title_id" class="form-control">
+                                                <!-- <t t-if="'title' in jamaah and jamaah['title']">
+                                                    <option t-att-value="title.id" selected="">
+                                                        <t t-esc="title.name" />
+                                                    </option>
+                                                </t>
+                                                <t t-else="">
+                                                    <option value="" selected="" disabled="">Title</option>
+                                                </t> -->
+                                                <t t-foreach="title_id" t-as="title">
+                                                    <option t-att-value="title.id">
+                                                        <t t-esc="title.name" />
+                                                    </option>
+                                                </t>
+                                            </select>
+                                        </div>
+                                        <div class="w-100"/>
+                                        <div t-attf-class="form-group #{error.get('father_name') and 'o_has_error' or ''} col-lg-6" id="div_father_name">
+                                            <label class="col-form-label" for="father_name">Father's Name</label>
+                                            <input type="text" name="father_name" t-attf-class="form-control #{error.get('father_name') and 'is-invalid' or ''}" t-att-value="'father_name' in jamaah and jamaah['father_name']" />
+                                        </div>
+                                        <div class="w-100"/>
+                                        <div t-attf-class="form-group #{error.get('mother_name') and 'o_has_error' or ''} col-lg-6" id="div_mother_name">
+                                            <label class="col-form-label" for="mother_name">Mother's Name</label>
+                                            <input type="text" name="mother_name" t-attf-class="form-control #{error.get('mother_name') and 'is-invalid' or ''}" t-att-value="'mother_name' in jamaah and jamaah['mother_name']" />
+                                        </div>
+                                        <div class="w-100"/>
+                                        <div t-attf-class="form-group #{error.get('job') and 'o_has_error' or ''} col-lg-6" id="div_job">
+                                            <label class="col-form-label" for="job">Job</label>
+                                            <input type="text" name="job" t-attf-class="form-control #{error.get('job') and 'is-invalid' or ''}" t-att-value="'job' in jamaah and jamaah['job']" />
+                                        </div>
+                                        <div class="w-100"/>
+                                        <div t-attf-class="form-group #{error.get('blood_type') and 'o_has_error' or ''} col-lg-6" id="div_blood_type">
+                                            <label class="col-form-label" for="blood_type">Blood Type</label>
+                                            <select id="blood_type" class="form-control">
+                                                <option value="" selected="" disabled="">Title</option>
+                                                <t t-foreach="blood_type" t-as="type">
+                                                    <option t-att-value="type.id">
+                                                        <t t-esc="type.name" />
+                                                    </option>
+                                                </t>
+                                            </select>
+                                        </div>
+                                        <div class="w-100"/>
+                                        <div t-attf-class="form-group #{error.get('marital_status') and 'o_has_error' or ''} col-lg-6" id="div_marital_status">
+                                            <label class="col-form-label" for="marital_status">Marital Status</label>
+                                            <select id="marital_status" class="form-control">
+                                                <option value="" selected="" disabled="">Title</option>
+                                                <t t-foreach="marital_status" t-as="status">
+                                                    <option t-att-value="status.id">
+                                                        <t t-esc="status.name" />
+                                                    </option>
+                                                </t>
+                                            </select>
+                                        </div>
+                                        <div class="w-100"/>
+                                        <div t-attf-class="form-group #{error.get('education') and 'o_has_error' or ''} col-lg-6" id="div_education">
+                                            <label class="col-form-label" for="education">Education</label>
+                                            <select id="education_id" class="form-control">
+                                                <option value="" selected="" disabled="">Title</option>
+                                                <t t-foreach="education_id" t-as="education">
+                                                    <option t-att-value="education.id">
+                                                        <t t-esc="education.name" />
+                                                    </option>
+                                                </t>
+                                            </select>
+                                        </div>
+                                        <div class="w-100"/>
+                                        <div t-attf-class="form-group #{error.get('clothes_size') and 'o_has_error' or ''} col-lg-6" id="div_clothes_size">
+                                            <label class="col-form-label" for="clothes_size">Clothes Size</label>
+                                            <select id="clothes_size" class="form-control">
+                                                <option value="" selected="" disabled="">Clothes Size</option>
+                                                <t t-foreach="clothes_size" t-as="size">
+                                                    <option t-att-value="size.id">
+                                                        <t t-esc="size.name" />
+                                                    </option>
+                                                </t>
+                                            </select>
+                                        </div>
+                                        <div class="w-100"/>
+                                        <div t-attf-class="form-group #{error.get('pass_no') and 'o_has_error' or ''} col-lg-6" id="div_pass_no">
+                                            <label class="col-form-label" for="pass_no">Passport No</label>
+                                            <input type="text" name="pass_no" t-attf-class="form-control #{error.get('pass_no') and 'is-invalid' or ''}" t-att-value="'pass_no' in jamaah and jamaah['pass_no']" />
+                                        </div>
+                                        <div class="w-100"/>
+                                        <div t-attf-class="form-group #{error.get('pass_name') and 'o_has_error' or ''} col-lg-6" id="div_pass_name">
+                                            <label class="col-form-label" for="pass_name">Passport Name</label>
+                                            <input type="text" name="pass_name" t-attf-class="form-control #{error.get('pass_name') and 'is-invalid' or ''}" t-att-value="'pass_name' in jamaah and jamaah['pass_name']" />
+                                        </div>
+                                        <div class="w-100"/>
+                                        <div t-attf-class="form-group #{error.get('date_isue') and 'o_has_error' or ''} col-lg-6" id="div_date_issue">
+                                            <label class="col-form-label" for="date_isue">Date Issued</label>
+                                            <input type="date" name="date_isue" t-attf-class="form-control #{error.get('date_isue') and 'is-invalid' or ''}" t-att-value="'date_isue' in jamaah and jamaah['date_isue']" />
+                                        </div>
+                                        <div class="w-100"/>
+                                        <div t-attf-class="form-group #{error.get('date_exp') and 'o_has_error' or ''} col-lg-6" id="div_date_exp">
+                                            <label class="col-form-label" for="date_exp">Date of Expiry</label>
+                                            <input type="date" name="date_exp" t-attf-class="form-control #{error.get('date_exp') and 'is-invalid' or ''}" t-att-value="'date_exp' in jamaah and jamaah['date_exp']" />
+                                        </div>
+                                        <div class="w-100"/>
+                                        <div t-attf-class="form-group #{error.get('imigrasi') and 'o_has_error' or ''} col-lg-6" id="div_imigrasi">
+                                            <label class="col-form-label" for="imigrasi">Imigrasi</label>
+                                            <input type="text" name="imigrasi" t-attf-class="form-control #{error.get('imigrasi') and 'is-invalid' or ''}" t-att-value="'imigrasi' in jamaah and jamaah['imigrasi']" />
+                                        </div>
+                                        
+                                        <!-- <div class="w-100"/>
+                                        <div t-attf-class="form-group #{error.get('country_id') and 'o_has_error' or ''} col-lg-6 div_country">
+                                            <label class="col-form-label" for="country_id">Country</label>
+                                            <select id="country_id" name="country_id" t-attf-class="form-control #{error.get('country_id') and 'is-invalid' or ''}" t-att-mode="mode[1]">
+                                                <option value="">Country...</option>
+                                                <t t-foreach="countries" t-as="c">
+                                                    <option t-att-value="c.id" t-att-selected="c.id == (country and country.id or -1)">
+                                                        <t t-esc="c.name" />
+                                                    </option>
+                                                </t>
+                                            </select>
+                                        </div> -->
+                                        <!-- <div t-attf-class="form-group #{error.get('state_id') and 'o_has_error' or ''} col-lg-6 div_state" t-att-style="(not country or not country.state_ids) and 'display: none'">
+                                            <label class="col-form-label" for="state_id">State / Province</label>
+                                            <select name="state_id" t-attf-class="form-control #{error.get('state_id') and 'is-invalid' or ''}" data-init="1">
+                                                <option value="">State / Province...</option>
+                                                <t t-foreach="country_states" t-as="s">
+                                                    <option t-att-value="s.id" t-att-selected="s.id == ('state_id' in jamaah and country and jamaah['state_id'] != '' and int(jamaah['state_id']))">
+                                                        <t t-esc="s.name" />
+                                                    </option>
+                                                </t>
+                                            </select>
+                                        </div> -->
+                                    </div>
+
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                                    <input type="hidden" name="partner_id" t-att-value="partner_id or '0'" />
+                                    <!-- Example -->
+                                    <input type="hidden" name="field_required" t-att-value="'phone,name'" />
+
+                                    <div class="d-flex justify-content-between">
+                                        <!-- <a role="button" t-att-href="mode == ('new', 'billing') and '/shop/cart' or '/shop/jamaah'" class="btn btn-secondary mb32">
+                                            <i class="fa fa-chevron-left"/>
+                                            <span>Back</span>
+                                        </a>
+                                        <a href="/shop/jamaah/register/add" role="button" class="btn btn-primary btn-lg s_website_form_send">
+                                            <span>Save</span>
+                                            <i class="fa fa-chevron-right"/>
+                                        </a> -->
+                                        <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="cart_inherit" inherit_id="website_sale.cart">
+        <xpath expr="//t/div/div/div/div[2]/div/div/a[2]" position="replace">
+            <a role="button" t-if="website_sale_order and website_sale_order.website_order_line" class="btn btn-primary float-right d-none d-xl-inline-block" href="/shop/jamaah">
+                <span class="">Process Checkout</span>
+                <span class="fa fa-chevron-right" />
+            </a>
+        </xpath>
+        <xpath expr="//t/div/div/div/div[3]/div/a[2]" position="replace">
+            <a role="button" t-if="website_sale_order and website_sale_order.website_order_line" class="btn btn-primary float-right" href="/shop/jamaah">
+                <span class="">Process Checkout</span>
+                <span class="fa fa-chevron-right" />
+            </a>
+        </xpath>
+    </template>
+
+    <template id="short_cart_summary_inherit" name="Short Cart right column" inherit_id="website_sale.short_cart_summary">
+        <xpath expr="//div/div/div/a" position="replace">
+            <a role="button" t-if="website_sale_order and website_sale_order.website_order_line" class="btn btn-secondary float-right d-none d-xl-inline-block" href="/shop/jamaah">
+                <span>Process Checkout</span>
+            </a>
+        </xpath>
+    </template>
+
+</odoo>

@@ -29,14 +29,21 @@ class ManifestLines(models.Model):
         ('quad', 'Quad'),
         ('reg', 'Regular')
     ])
+
+    def calculate_age(self):
+        if self.date_birth:
+            today = self.date_birth.today()
+            born = self.date_birth
+            self.age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
     
     @api.onchange('date_birth')
+    def _onchange_calculate_age(self):
+        self.calculate_age()
+
+    @api.depends('date_birth')
     def _compute_calculate_age(self):
         for rec in self:
-            if rec.date_birth:
-                today = rec.date_birth.today()
-                born = rec.date_birth
-                rec.age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
+            rec.calculate_age()
 
     @api.onchange('name')
     def _onchange_domain(self):

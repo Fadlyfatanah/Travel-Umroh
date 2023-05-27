@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="contact_travel" name="contact_travel" inherit_id="base.contact">
+        <xpath expr="//address/div[@itemprop='address']" position="before">
+            <div t-if="object.ktp_no and 'ktp_no' in fields" class='css_editable_mode_hidden'>
+                <div t-if="ktp_no and 'ktp_no' in fields">
+                    <i t-if="not options.get('no_marker')" class='fa fa-address-card' role="img" aria-label="KTP" title="KTP"/>
+                    <span class="o_force_ltr" itemprop="ktp_no" t-esc="object.ktp_no"/>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>
