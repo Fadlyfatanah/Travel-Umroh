@@ -48,7 +48,6 @@
                         <td class="text-right"><span t-field="package.departure_date"/></td>
                         <td class="text-right"><span t-field="package.return_date"/></td>
                         <td class="text-center">
-                            <span t-if="package.state == 'reschedule'" class="badge badge-pill badge-secondary"><i class="fa fa-fw fa-clock-o"/> Reschedule</span>
                             <span t-if="package.state == 'confirm'" class="badge badge-pill badge-warning"><i class="fa fa-fw fa-folder-open"/> Open</span>
                             <span t-if="package.state == 'done'" class="badge badge-pill badge-success"><i class="fa fa-fw fa-calendar-check-o"/> Done</span>
                             <span t-if="package.state == 'cancel'" class="badge badge-pill badge-light"><i class="fa fa-fw fa-remove"/> Cancelled</span>
@@ -69,7 +68,6 @@
             <t t-call="portal.portal_record_layout">
                 <t t-set="card_header" >
                     <span class="float-right">
-                        <span t-if="package.state == 'reschedule'" class=" badge badge-pill badge-secondary"  style="font-size: 16px;"><i class="fa fa-fw fa-clock-o"/> Reschedule</span>
                         <span t-if="package.state == 'confirm'" class=" badge badge-pill badge-warning"  style="font-size: 16px;"><i class="fa fa-fw fa-folder-open"/> Open</span>
                         <span t-if="package.state == 'done'" class=" badge badge-pill badge-success"  style="font-size: 16px;"><i class="fa fa-fw fa-calendar-check-o"/> Done</span>
                         <span t-if="package.state == 'cancel'" class=" badge badge-pill badge-light"  style="font-size: 16px;"><i class="fa fa-fw fa-remove"/> Cancelled</span>

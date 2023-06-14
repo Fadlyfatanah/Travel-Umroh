@@ -36,7 +36,6 @@ class TravelPackage(models.Model):
         ('confirm', 'Confirm'),
         ('open', 'Open'),
         ('done', 'Done'),
-        ('reschedule', 'Reschedule'),
     ], default='draft', string='Status')
 
     @api.depends('quota', 'manifest_line')
@@ -102,28 +101,17 @@ class TravelPackage(models.Model):
         return self.write({'state': 'open'})
     
     def action_done(self):
-        self.action_update()
         return self.write({'state': 'done'})
-    
-    def action_update(self):
-        for rec in self:
-            for sale in rec.env['sale.order'].search([('package_id', '=', rec.id), ('state', '=', 'sale')]):
-                for manifest in sale.manifest_line:
-                    manifest.write({
-                        'agent': sale.user_id.id,
-                        'travel_id': rec.id
-                    })
     
     def action_to_draft(self):
         return self.write({'state': 'draft'})
     
-    def action_reschedule(self):
-        return self.write({'state': 'reschedule'})
-    
     def name_get(self):
         res = []
         for rec in self:
-            res.append((rec.id, '%s# %s' % (rec.name, rec.product_id.name)))
+            departure_date = rec.departure_date.strftime('%d %b')
+            return_date = rec.return_date.strftime('%d %b')
+            res.append((rec.id, '%s (%s - %s)' % (rec.name, departure_date, return_date)))
         return res
 
     @api.depends('subtotal', 'jamaah_count')

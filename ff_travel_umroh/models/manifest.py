@@ -5,6 +5,13 @@ class ManifestLines(models.Model):
     _name = 'manifest.lines'
     _description = 'Manifest Lines'
 
+    def _domain_travel_package(self):
+        domain = []
+        travel_ids = self.order_id.order_line.mapped('travel_id') if self.order_id else False
+        if self._context.get('from_so', False) and travel_ids:
+            domain = domain.append(('id', 'in', travel_ids.ids))
+        return domain
+
     name = fields.Many2one('res.partner', string='Jamaah', required=True)
     ktp_no = fields.Char(related='name.ktp_no')
     date_birth = fields.Date(related='name.date_birth')
@@ -17,7 +24,7 @@ class ManifestLines(models.Model):
     title = fields.Many2one(related='name.title', ondelete='cascade')
     gender = fields.Selection(related='name.gender')
     partner_id = fields.Many2one('res.partner', string='Partner')
-    travel_id = fields.Many2one('travel.package')
+    travel_id = fields.Many2one('travel.package', domain=_domain_travel_package)
     age = fields.Integer()
     mahram = fields.Many2one('res.partner', string='Mahram')
     notes = fields.Char(string='Notes')
@@ -56,3 +63,10 @@ class ManifestLines(models.Model):
             domain['domain']['name'] = [('id', 'in', jamaah_ids.ids)]
 
         return domain
+    
+    @api.model_create_multi
+    def create(self, vals_list):
+        res_ids = super(ManifestLines, self).create(vals_list)
+        for res in res_ids:
+            agent = res.order_id.user_id if res.order_id else False
+            res.agent = agent

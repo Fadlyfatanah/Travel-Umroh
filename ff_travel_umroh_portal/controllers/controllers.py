@@ -162,7 +162,7 @@ class CustomerPortal(CustomerPortal):
         if 'package_count' in counters:
             values['package_count'] = TravelPackage.search_count([
                 ('id', 'in', package_ids),
-                ('state', 'in', ['reschedule', 'confirm', 'done'])
+                ('state', 'in', ['confirm', 'done'])
             ]) if TravelPackage.check_access_rights('read', raise_exception=False) else 0
         return values
 
@@ -202,7 +202,7 @@ class CustomerPortal(CustomerPortal):
 
         domain = [
             ('id', 'in', package_ids),
-            ('state', 'in', ['reschedule', 'confirm', 'done'])
+            ('state', 'in', ['confirm', 'done'])
         ]
 
         searchbar_sortings = {
@@ -290,6 +290,52 @@ class GetDropDown(http.Controller):
     
 class WebsiteSale(http.Controller):
 
+    def _prepare_product_values(self, product, category, search, **kwargs):
+        add_qty = int(kwargs.get('add_qty', 1))
+
+        product_context = dict(request.env.context, quantity=add_qty,
+                               active_id=product.id,
+                               partner=request.env.user.partner_id)
+        ProductCategory = request.env['product.public.category']
+
+        if category:
+            category = ProductCategory.browse(int(category)).exists()
+
+        attrib_list = request.httprequest.args.getlist('attrib')
+        attrib_values = [[int(x) for x in v.split("-")] for v in attrib_list if v]
+        attrib_set = {v[1] for v in attrib_values}
+
+        keep = QueryURL('/shop', category=category and category.id, search=search, attrib=attrib_list)
+
+        categs = ProductCategory.search([('parent_id', '=', False)])
+
+        pricelist = request.website.get_current_pricelist()
+
+        if not product_context.get('pricelist'):
+            product_context['pricelist'] = pricelist.id
+            product = product.with_context(product_context)
+
+        # Needed to trigger the recently viewed product rpc
+        view_track = request.website.viewref("website_sale.product").track
+
+        packages = product.package_ids
+
+        return {
+            'search': search,
+            'category': category,
+            'pricelist': pricelist,
+            'attrib_values': attrib_values,
+            'attrib_set': attrib_set,
+            'keep': keep,
+            'categories': categs,
+            'main_object': product,
+            'product': product,
+            'add_qty': add_qty,
+            'view_track': view_track,
+            'packages': packages,
+        }
+
+
     @http.route(['/shop/checkout'], type='http', auth="public", website=True, sitemap=False)
     def checkout(self, **post):
         order = request.website.sale_get_order()
@@ -315,86 +361,15 @@ class WebsiteSale(http.Controller):
     
     @http.route(['/shop/jamaah'], type='http', methods=['GET', 'POST'], auth="public", website=True, sitemap=False)
     def jamaah(self, **kw):
-        Partner = request.env['res.partner']
+        errors = {}
         order = request.website.sale_get_order()
-
-        redirection = self.checkout_redirection(order)
-        if redirection:
-            return redirection
-
-        mode = (False, False)
-        can_edit_vat = False
-        values, errors = {}, {}
-
-        partner_id = int(kw.get('partner_id', -1))
-
-        # IF PUBLIC ORDER
-        if order.partner_id.id == request.website.user_id.sudo().partner_id.id:
-            mode = ('new', 'billing')
-            can_edit_vat = True
-        # IF ORDER LINKED TO A PARTNER
-        else:
-            if partner_id > 0:
-                if partner_id == order.partner_id.id:
-                    mode = ('edit', 'billing')
-                    can_edit_vat = order.partner_id.can_edit_vat()
-                else:
-                    shippings = Partner.search([('id', 'child_of', order.partner_id.commercial_partner_id.ids)])
-                    if order.partner_id.commercial_partner_id.id == partner_id:
-                        mode = ('new', 'shipping')
-                        partner_id = -1
-                    elif partner_id in shippings.mapped('id'):
-                        mode = ('edit', 'shipping')
-                    else:
-                        return Forbidden()
-                if mode and partner_id != -1:
-                    values = Partner.browse(partner_id)
-            elif partner_id == -1:
-                mode = ('new', 'shipping')
-            else: # no mode - refresh without post?
-                return request.redirect('/shop/checkout')
-
-        # IF POSTED
-        if 'submitted' in kw and request.httprequest.method == "POST":
-            pre_values = self.values_preprocess(order, mode, kw)
-            errors, error_msg = self.checkout_form_validate(mode, kw, pre_values)
-            post, errors, error_msg = self.values_postprocess(order, mode, pre_values, errors, error_msg)
-
-            if errors:
-                errors['error_message'] = error_msg
-                values = kw
-            else:
-                partner_id = self._checkout_form_save(mode, post, kw)
-                # We need to validate _checkout_form_save return, because when partner_id not in shippings
-                # it returns Forbidden() instead the partner_id
-                if isinstance(partner_id, Forbidden):
-                    return partner_id
-                if mode[1] == 'billing':
-                    order.partner_id = partner_id
-                    order.with_context(not_self_saleperson=True).onchange_partner_id()
-                    # This is the *only* thing that the front end user will see/edit anyway when choosing billing address
-                    order.partner_invoice_id = partner_id
-                    if not kw.get('use_same'):
-                        kw['callback'] = kw.get('callback') or \
-                            (not order.only_services and (mode[0] == 'edit' and '/shop/checkout' or '/shop/address'))
-                    # We need to update the pricelist(by the one selected by the customer), because onchange_partner reset it
-                    # We only need to update the pricelist when it is not redirected to /confirm_order
-                    if kw.get('callback', '') != '/shop/confirm_order':
-                        request.website.sale_get_order(update_pricelist=True)
-                elif mode[1] == 'shipping':
-                    order.partner_shipping_id = partner_id
-
-                # TDE FIXME: don't ever do this
-                order.message_partner_ids = [(4, partner_id), (3, request.website.partner_id.id)]
-                if not errors:
-                    return request.redirect(kw.get('callback') or '/shop/confirm_order')
+        package_ids = order.order_line.mapped('package_id')
 
         render_values = {
             'website_sale_order': order,
+            'package_ids': package_ids,
             'error': errors,
-            'callback': kw.get('callback'),
         }
-        # render_values.update(self._get_country_related_render_values(kw, render_values))
         return request.render("ff_travel_umroh_portal.jamaah", render_values)
     
     def checkout_redirection(self, order):

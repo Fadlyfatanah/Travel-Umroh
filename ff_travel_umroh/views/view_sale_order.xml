@@ -6,8 +6,8 @@
     <field name="model">sale.order</field>
     <field name="inherit_id" ref="sale.view_order_form" />
     <field name="arch" type="xml">
-      <xpath expr="//field[@name='partner_id']" position="after">
-        <field name="package_id" domain="[('state', '=', 'open')]"/>
+      <xpath expr="//page[@name='order_lines']//tree//field[@name='product_id']" position="after">
+        <field name="package_id" domain="[('product_id', '=', product_id), ('state', '=', 'open')]" options="{'no_create': True}"/>
       </xpath>
       <xpath expr="//page[@name='order_lines']//tree//field[@name='product_id']" position="attributes">
         <attribute name="context">{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom, 'company_id': parent.company_id, 'package_ok': False}</attribute>
@@ -17,6 +17,7 @@
         <page string="Manifest">
           <field name="manifest_line">
             <tree>
+              <field name="travel_id" />
               <field name="title" />
               <field name="name" />
               <field name="gender" />
@@ -34,6 +35,9 @@
             </tree>
             <form>
               <sheet>
+                <group string="Package">
+                  <field name="travel_id" domain="[('state', '=', 'open')]" options="{'no_create': True}" context="{'from_so': True}"/>
+                </group>
                 <group string="Personal">
                   <group>
                     <field name="name" domain="[('jamaah', '=', True)]"/>
