@@ -12,20 +12,6 @@
                     <label for="package_ok"/>
                 </div>
             </xpath>
-            <xpath expr="//notebook" position="inside">
-                <page name="packages_list" string="Packages">
-                    <field name="package_ids" readonly="1">
-                        <tree>
-                            <field name="name"/>
-                            <field name="departure_date"/>
-                            <field name="return_date"/>
-                            <field name="quota_progress" widget="progressbar"/>
-                            <field name="subtotal"/>
-                            <field name="state"/>
-                        </tree>
-                    </field>
-                </page>
-            </xpath>
         </field>
     </record>
 

@@ -25,6 +25,8 @@ function createTable(row) {
 function renderBody(idRow) {
   let selectJamaah = createElementSelect("jamaah", `selectJamaah(${idRow})`);
   let ktp = `<td><span name="ktp_no"></span></td>`;
+  let room_type = `<td><span name="room_type"></span></td>`;
+  let mahram = `<td><span name="mahram"></span></td>`;
   let gender = `<td><span name="gender"></span></td>`;
   let age = `<td><span name="age"></span></td>`;
   let selectMahram = createElementSelect("mahram");

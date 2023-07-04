@@ -9,7 +9,6 @@
       <field name="arch" type="xml">
         <tree>
           <field name="name"/>
-          <field name="product_id"/>
           <field name="departure_date"/>
           <field name="return_date"/>
           <field name="quota"/>
@@ -31,7 +30,7 @@
             <button name="action_confirm" string="Confirm" type="object" states="draft" class="oe_highlight"/>
             <button name="action_open" string="Open" type="object" states="confirm" class="oe_highlight"/>
             <button name="action_done" string="Done" type="object" states="open" class="oe_highlight"/>
-            <button name="action_to_draft" string="Set to Draft" type="object" states="confirm"/>
+            <button name="action_to_draft" string="Set to Draft" type="object" states="confirm,open"/>
             <field name="state" widget="statusbar" statusbar_visible="draft,confirm,open,done"/>
           </header>
           <sheet>
@@ -48,7 +47,6 @@
                 </group>
                 <group>
                   <field name="return_date" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
-                  <field name="product_id" attrs="{'readonly': [('state', 'not in', ['draft'])]}" domain="[('package_ok', '=', True)]"/>
                 </group>
               </group>
               <group string="Seats" colspan="4">
@@ -123,6 +121,27 @@
                     <field name="mahram" />
                     <field name="agent" />
                   </tree>
+                  <form>
+                    <sheet>
+                      <group>
+                        <field name="gender" />
+                        <field name="pass_name" />
+                        <field name="pass_no" />
+                        <field name="ktp_no" />
+                        <field name="date_birth" />
+                        <field name="place_birth" />
+                        <field name="date_isue" />
+                      </group>
+                      <group>
+                        <field name="date_exp" />
+                        <field name="imigrasi" />
+                        <field name="age" />
+                        <field name="room_type" />
+                        <field name="mahram" />
+                        <field name="agent" />
+                      </group>
+                    </sheet>
+                  </form>
                 </field>
               </page>
               <page string="HPP Lines">

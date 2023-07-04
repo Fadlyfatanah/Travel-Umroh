@@ -31,30 +31,3 @@ class Contact(models.AbstractModel):
             'options': options
         }
         return self.env['ir.qweb']._render('base.contact', val, **options.get('template_options', dict()))
-
-    # @api.model
-    # def get_available_options(self):
-    #     options = super(Contact, self).get_available_options()
-        # contact_fields = [
-        #     {'field_name': 'name', 'label': _('Name'), 'default': True},
-        #     {'field_name': 'address', 'label': _('Address'), 'default': True},
-        #     {'field_name': 'phone', 'label': _('Phone'), 'default': True},
-        #     {'field_name': 'mobile', 'label': _('Mobile'), 'default': True},
-        #     {'field_name': 'email', 'label': _('Email'), 'default': True},
-        #     {'field_name': 'vat', 'label': _('VAT')},
-        #     {'field_name': 'ktp_no', 'label': _('KTP'), 'default': True},
-        # ]
-        # separator_params = dict(
-        #     type='selection',
-        #     selection=[[" ", _("Space")], [",", _("Comma")], ["-", _("Dash")], ["|", _("Vertical bar")], ["/", _("Slash")]],
-        #     placeholder=_('Linebreak'),
-        # )
-        # options.update(
-        #     fields=dict(type='array', params=dict(type='selection', params=contact_fields), string=_('Displayed fields'), description=_('List of contact fields to display in the widget'), default_value=[param.get('field_name') for param in contact_fields if param.get('default')]),
-        #     separator=dict(type='selection', params=separator_params, string=_('Address separator'), description=_('Separator use to split the address from the display_name.'), default_value=False),
-        #     no_marker=dict(type='boolean', string=_('Hide badges'), description=_("Don't display the font awesome marker")),
-        #     no_tag_br=dict(type='boolean', string=_('Use comma'), description=_("Use comma instead of the <br> tag to display the address")),
-        #     phone_icons=dict(type='boolean', string=_('Display phone icons'), description=_("Display the phone icons even if no_marker is True")),
-        #     country_image=dict(type='boolean', string=_('Display country image'), description=_("Display the country image if the field is present on the record")),
-        # )
-        # return options

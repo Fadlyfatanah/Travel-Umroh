@@ -7,142 +7,9 @@ from werkzeug.exceptions import Forbidden, NotFound
 from odoo import fields, http, SUPERUSER_ID, tools, _
 from odoo.exceptions import AccessError, MissingError, ValidationError
 from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager, get_records_pager
+from odoo.addons.website_sale.controllers.main import WebsiteSale
 from odoo.http import request
-from odoo.addons.base.models.ir_qweb_fields import nl2br
-from odoo.addons.http_routing.models.ir_http import slug
-from odoo.addons.payment.controllers.portal import PaymentProcessing
-from odoo.addons.website.controllers.main import QueryURL
-from odoo.addons.website.models.ir_http import sitemap_qs2dom
-from odoo.addons.portal.controllers.portal import _build_url_w_params
-from odoo.addons.website.controllers.main import Website
-from odoo.addons.website_form.controllers.main import WebsiteForm
-from odoo.osv import expression
 _logger = logging.getLogger(__name__)
-
-class TravelUmroh(http.Controller):
-    @http.route(['/pendaftaran', '/pendaftaran/<data>', '/pendaftaran/result/<model>'], auth='public', type='http', website=True, csrf=False)
-    def form_pedaftaran(self, data=False, model=False, records={}, **kwargs):
-        value = {}
-        Partner = request.env['res.partner'].sudo()
-        Title = request.env['res.partner.title'].sudo()
-        SaleOrder = request.env['sale.order'].sudo()
-        TravelPackage = request.env['travel.package'].sudo()
-        PaymentTerm = request.env['account.payment.term'].sudo()
-        Package = request.env['travel.package'].sudo()
-        User = request.env['res.users'].sudo()
-        uid = request._uid
-        records.update(kwargs)
-        user_id = User.browse(uid)
-        partner_id = user_id.partner_id
-        tempRequest = request.httprequest
-        getAttr = tempRequest.values
-
-        # Domain for search jamaah
-        domain = [('company_type', '=', 'person')]
-        if not user_id.has_group('ff_travel_umroh.group_travel_umroh_manager') or data == 'getListMahram':
-            domain.append(('parent_id', '=', partner_id.id))
-        else:
-            domain.append(('parent_id', '!=', False))
-
-        if data:
-            if data == 'getListJamaah':
-                listJamaah = getAttr['listJamaah'] if getAttr.get('listJamaah', False) else []
-                domain.append(('id', 'not in', listJamaah))
-                text = "<option value='' selected='' disabled=''>Jamaah</option>"
-                for rec in Partner.sudo().search(domain):
-                    text = text + "<option value='"+str(rec.id)+"'>"+str(rec.name)+"</option>"
-                return text
-            elif data == 'getListMahram':
-                jamaah_id = int(getAttr['jamaah_id']) if getAttr.get('jamaah_id', False) else False
-                domain.append(('id', '!=', jamaah_id))
-                jamaah_ids = Partner.search(domain)
-                text = "<option value='' selected='' disabled=''>Mahram</option>"
-                for rec in jamaah_ids:
-                    text = text + "<option value='"+str(rec.id)+"'>"+str(rec.name)+"</option>"
-                return text
-            elif data == 'getDetailJamaah':
-                tempRequest = request.httprequest
-                getAttr = tempRequest.values
-                int_id = int(getAttr['jamaah_id']) if getAttr.get('jamaah_id', False) else False
-                data = {}
-                if int_id:
-                    jamaah = Partner.browse(int_id)
-                    today = fields.Date.today()
-                    born = jamaah.date_birth
-                    age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
-                    gender = dict(jamaah._fields['gender'].selection).get(jamaah.gender)
-                    text = "<jamaah><div name='ktp_no'>"+str(jamaah.ktp_no)+"</div><div name='gender'>"\
-                        +str(gender)+"</div><div name='age'>"+str(age)+"</div></jamaah>"
-                return text
-                # return xml_doc.write(file)
-            elif data == 'data-diri':
-                blood_type = Partner._fields['blood_type'].selection
-                education = Partner._fields['education'].selection
-                gender = Partner._fields['gender'].selection
-                # title_person = Title.search([('type', '=', 'person')])
-                value.update({
-                    'blood_type': blood_type,
-                    'education': education,
-                    'gender': gender,
-                    # 'title_person': title_person,
-                })
-                return http.request.render('ff_travel_umroh_portal.pendaftaran_data_diri', value)
-            elif data == 'data-tambahan':
-                marital_status = Partner._fields['marital_status'].selection
-                clothes_size = Partner._fields['clothes_size'].selection
-                value.update({
-                    'marital_status': marital_status,
-                    'clothes_size': clothes_size,
-                })
-                return http.request.render('ff_travel_umroh_portal.pendaftaran_data_tambahan', value)
-            elif data == 'data-passport':
-                return http.request.render('ff_travel_umroh_portal.pendaftaran_data_passport', {})
-            elif data == 'data-gambar':
-                return http.request.render('ff_travel_umroh_portal.pendaftaran_data_gambar', {})
-            elif data == 'result':
-                if model == 'respartner':
-                    records.update({
-                        'parent_id': uid,
-                        'company_type': 'person',
-                    })
-                    self._check_field_before_create(records)
-                    Partner.sudo().create(records)
-                    return http.request.render('ff_travel_umroh_portal.pendaftaran', {})
-                elif model == 'saleorder':
-                    value.update({
-                        'state': 'sale',
-                        'partner_id': uid,
-                        # 'package_id': ,
-                    })
-                    SaleOrder.sudo().create(value)
-                    # return http.request.render('ff_travel_umroh_portal.so', {})
-
-        else:
-            package_id = TravelPackage.search([('state', '=', 'open')])
-            jamaah_id = Partner.search([('company_type', '=', 'person'), ('parent_id', '=', uid)])
-            # title_person = Title.search([('type', '=', 'person')])
-            room_type = request.env['manifest.lines']._fields['room_type'].selection
-            value.update({
-                'package_id': package_id,
-                'jamaah_id': jamaah_id,
-                # 'title_person': title_person,
-                'room_type': room_type,
-                'manifest_line': SaleOrder.manifest_line
-            })
-            return http.request.render('ff_travel_umroh_portal.pendaftaran', value)
-            
-    
-    def _check_field_before_create(self, res):
-        Model = request.env['res.partner']
-        for key in res:
-            if key not in Model._fields:
-                continue
-            elif isinstance(Model._fields[key], fields.Many2one):
-                res[key] = int(res[key])
-            elif isinstance(Model._fields[key], fields.Selection):
-                if isinstance(res[key], dict) and "value" in res[key]:
-                    res[key] = res[key]["value"]
-        return res
 
 class CustomerPortal(CustomerPortal):
 
@@ -153,15 +20,10 @@ class CustomerPortal(CustomerPortal):
         MySaleOrder = SaleOrder.search([('message_partner_ids', 'child_of', [partner.commercial_partner_id.id]),\
             ('state', 'in', ['sent', 'sale'])])
         
-        package_ids = []
-        for order in MySaleOrder:
-            if order.package_id:
-                package_ids.append(order.package_id.id)
-
         TravelPackage = request.env['travel.package']
         if 'package_count' in counters:
             values['package_count'] = TravelPackage.search_count([
-                ('id', 'in', package_ids),
+                # ('id', 'in', package_ids),
                 ('state', 'in', ['confirm', 'done'])
             ]) if TravelPackage.check_access_rights('read', raise_exception=False) else 0
         return values
@@ -169,7 +31,7 @@ class CustomerPortal(CustomerPortal):
     def _package_get_page_view_values(self, package, access_token, **kw):
         partner = request.env.user.partner_id
         order_id = request.env['sale.order'].search([('message_partner_ids', 'child_of',\
-        [partner.commercial_partner_id.id]), ('state', 'in', ['sent', 'sale']), ('package_id', '=', package.id)])
+        [partner.commercial_partner_id.id]), ('state', 'in', ['sent', 'sale'])])
         manifest_line = request.env['manifest.lines'].sudo().search([('order_id', '=', order_id.id)])
         airline_line = request.env['airline.lines'].sudo().search([('travel_id', '=', package.id)])
         hotel_line = request.env['hotel.lines'].sudo().search([('travel_id', '=', package.id)])
@@ -195,13 +57,8 @@ class CustomerPortal(CustomerPortal):
         SaleOrder = request.env['sale.order']
         MySaleOrder = SaleOrder.search([('message_partner_ids', 'child_of', [partner.commercial_partner_id.id]),\
             ('state', 'in', ['sent', 'sale'])])
-        package_ids = []
-        for order in MySaleOrder:
-            if order.package_id:
-                package_ids.append(order.package_id.id)
 
         domain = [
-            ('id', 'in', package_ids),
             ('state', 'in', ['confirm', 'done'])
         ]
 
@@ -288,82 +145,15 @@ class GetDropDown(http.Controller):
             text = text + "<option value='"+str(ll.id)+"'>"+str(ll.name)+"</option>"
         return text
     
-class WebsiteSale(http.Controller):
+class WebsiteSaleTravel(WebsiteSale):
 
-    def _prepare_product_values(self, product, category, search, **kwargs):
-        add_qty = int(kwargs.get('add_qty', 1))
-
-        product_context = dict(request.env.context, quantity=add_qty,
-                               active_id=product.id,
-                               partner=request.env.user.partner_id)
-        ProductCategory = request.env['product.public.category']
-
-        if category:
-            category = ProductCategory.browse(int(category)).exists()
-
-        attrib_list = request.httprequest.args.getlist('attrib')
-        attrib_values = [[int(x) for x in v.split("-")] for v in attrib_list if v]
-        attrib_set = {v[1] for v in attrib_values}
-
-        keep = QueryURL('/shop', category=category and category.id, search=search, attrib=attrib_list)
-
-        categs = ProductCategory.search([('parent_id', '=', False)])
-
-        pricelist = request.website.get_current_pricelist()
-
-        if not product_context.get('pricelist'):
-            product_context['pricelist'] = pricelist.id
-            product = product.with_context(product_context)
-
-        # Needed to trigger the recently viewed product rpc
-        view_track = request.website.viewref("website_sale.product").track
-
-        packages = product.package_ids
-
-        return {
-            'search': search,
-            'category': category,
-            'pricelist': pricelist,
-            'attrib_values': attrib_values,
-            'attrib_set': attrib_set,
-            'keep': keep,
-            'categories': categs,
-            'main_object': product,
-            'product': product,
-            'add_qty': add_qty,
-            'view_track': view_track,
-            'packages': packages,
-        }
-
-
-    @http.route(['/shop/checkout'], type='http', auth="public", website=True, sitemap=False)
-    def checkout(self, **post):
-        order = request.website.sale_get_order()
-
-        redirection = self.checkout_redirection(order)
-        if redirection:
-            return redirection
-
-        if request.website.user_id.sudo().partner_id.child_ids.ids:
-            return request.redirect('/shop/jamaah')
-
-        values = self.checkout_values(**post)
-
-        if post.get('express'):
-            return request.redirect('/shop/confirm_order')
-
-        values.update({'website_sale_order': order})
-
-        # Avoid useless rendering if called in ajax
-        if post.get('xhr'):
-            return 'ok'
-        return request.render("website_sale.checkout", values)
-    
     @http.route(['/shop/jamaah'], type='http', methods=['GET', 'POST'], auth="public", website=True, sitemap=False)
     def jamaah(self, **kw):
         errors = {}
         order = request.website.sale_get_order()
-        package_ids = order.order_line.mapped('package_id')
+        package_ids = order.order_line.mapped('product_id')\
+            .mapped('product_template_attribute_value_ids').mapped('product_attribute_value_id')\
+            .mapped('package_id')
 
         render_values = {
             'website_sale_order': order,
@@ -372,71 +162,66 @@ class WebsiteSale(http.Controller):
         }
         return request.render("ff_travel_umroh_portal.jamaah", render_values)
     
-    def checkout_redirection(self, order):
-        # must have a draft sales order with lines at this point, otherwise reset
-        if not order or order.state != 'draft':
-            request.session['sale_order_id'] = None
-            request.session['sale_transaction_id'] = None
-            return request.redirect('/shop')
+    @http.route(['/shop/jamaah/delete'], type='http', methods=['GET', 'POST'], auth="public", website=True, sitemap=False)
+    def jamaah_delete(self, **kw):
+        errors = {}
+        order = request.website.sale_get_order()
+        package_ids = order.order_line.mapped('product_id')\
+            .mapped('product_template_attribute_value_ids').mapped('product_attribute_value_id')\
+            .mapped('package_id')
+        # partner_id = int(kw.get('partner_id')) if kw.get('partner_id', False) else 0
+        # package_id = int(kw.get('package_id')) if kw.get('package_id', False) else 0
+        manifest = int(kw.get('manifest')) if kw.get('manifest', False) else 0
+        manifest_line = request.env['manifest.lines'].sudo().browse(manifest)
+        manifest_line.sudo().unlink()
 
-        if order and not order.order_line:
-            return request.redirect('/shop/cart')
-
-        # if transaction pending / done: redirect to confirmation
-        tx = request.env.context.get('website_sale_transaction')
-        if tx and tx.state != 'draft':
-            return request.redirect('/shop/payment/confirmation/%s' % order.id)
-        
+        render_values = {
+            'website_sale_order': order,
+            'package_ids': package_ids,
+            'error': errors,
+        }
+        return request.render("ff_travel_umroh_portal.jamaah", render_values)
+    
     @http.route(['/shop/jamaah/selection'], type='http', methods=['GET', 'POST'], auth="public", website=True, sitemap=False)
     def jamaah_selection(self, **kw):
-        render_list = []
         order = request.website.sale_get_order()
         jamaah_ids = order.partner_id.child_ids.filtered(lambda c: c.jamaah == True)
-        for jamaah in jamaah_ids:
-            name = jamaah.name
-            label = "%s(%s), %s" %(jamaah.name, jamaah.ktp_no, jamaah.phone)
-            render_list.append(
-                """
-                    <input id="%s" type="checkbox" name="%s" t-att-value="%s"/>
-                    <label class="col-form-label" for="%s">%s</label>
-                """ %("jamaah_%s" %(jamaah.id), name, jamaah.id, name, label)
-            )
         if jamaah_ids:
-            return request.render("ff_travel_umroh_portal.jamaah_selection", {"value": render_list})
+            render_values = {
+                "website_sale_order": order,
+                "jamaah_ids": jamaah_ids,
+                "package_id": kw.get('package_id', False),
+            }
+            return request.render("ff_travel_umroh_portal.jamaah_selection", render_values)
         else:
             return self.jamaah_register(kw)
     
     @http.route(['/shop/jamaah/selection/list'], type='http', methods=['GET'], auth="public", website=True, sitemap=False, csrf=False)
     def jamaah_selection_list(self, **kw):
         order = request.website.sale_get_order()
-        jamaah_ids = order.partner_id.child_ids.filtered(lambda c: c.jamaah == True)
+        jamaah_ids = order.partner_id.child_ids
         if jamaah_ids:
-            txt = ""
-            for jamaah in jamaah_ids:
-                id = "jamaah_%s" %(jamaah.id)
-                label = jamaah.name
-                if jamaah.ktp_no:
-                    label += "(%s)" %jamaah.ktp_no
-                if jamaah.phone or jamaah.mobile:
-                    label += ", %s" %jamaah.phone
-                    label += ", %s" %jamaah.mobile
-                txt += """
-                    <input id="%s" type="checkbox" name="%s" t-att-value="%s"/>
-                    <label class="col-form-label" for="%s">%s</label>
-                    <div class="w-100"/>
-                """ %(id, jamaah.id, jamaah.id, jamaah.name, label)
-            return txt
+           val = {"jamaah_ids": []}
+           for jamaah in jamaah_ids:
+               read_field = ["name", "ktp_no", "mobile", "phone"]
+               val["jamaah_ids"].append(jamaah.read(read_field)[0])
+           return json.dumps(val)
         else:
             return self.jamaah_register(kw)
     
     @http.route(['/shop/jamaah/selection/add'], type='http', methods=['POST'], auth="public", website=True, sitemap=False, csrf=False)
     def jamaah_selection_add(self, **kw):
         order = request.website.sale_get_order()
-        val_list = []
-        keys = kw.keys()
-        for key in keys:
+        package_ids = order.order_line.mapped('product_id')\
+            .mapped('product_template_attribute_value_ids').mapped('product_attribute_value_id')\
+            .mapped('package_id')
+        package_id = int(kw.get('package_id'))if kw.get('package_id', False) else False
+        for key in kw:
+            if kw[key] != 'on':
+                continue
             partner_id = request.env['res.partner'].browse(int(key))
-            val_list.append({
+            manifest_name = order.manifest_line.filtered(lambda m: m.travel_id.id == package_id).mapped('name')
+            val = {
                 'order_id': order.id,
                 'name': partner_id.id,
                 'ktp_no': partner_id.ktp_no,
@@ -447,12 +232,24 @@ class WebsiteSale(http.Controller):
                 'pass_name': partner_id.pass_name,
                 'date_isue': partner_id.date_isue,
                 'imigrasi': partner_id.imigrasi,
-                'title': partner_id.title,
+                'title': partner_id.title.id,
                 'gender': partner_id.gender,
-            })
-        request.env['manifest.lines'].sudo().create(val_list)
+                'travel_id': package_id,
+            }
+            if partner_id.id in manifest_name.ids:
+                get_manifest_by_partner = order.manifest_line\
+                    .filtered(lambda m: m.name.id == partner_id.id and m.travel_id.id == package_id)
+                if len(get_manifest_by_partner.ids) == 1:
+                    get_manifest_by_partner.sudo().write(val)
+            else:
+                order.sudo().write({'manifest_line': [(0,0,val)]})
+                
+        for line in order.manifest_line:
+            line.calculate_age()
+        
         render_values = {
             'website_sale_order': order,
+            'package_ids': package_ids,
             'callback': kw.get('callback'),
         }
         return request.render("ff_travel_umroh_portal.jamaah", render_values)
@@ -489,6 +286,9 @@ class WebsiteSale(http.Controller):
     @http.route(['/shop/jamaah/register/add'], type='http', auth="public", website=True, sitemap=False)
     def add_new_jamaah(self, **kw):
         order = request.website.sale_get_order()
+        package_ids = order.order_line.mapped('product_id')\
+            .mapped('product_template_attribute_value_ids').mapped('product_attribute_value_id')\
+            .mapped('package_id')
         partner_value = {
             "name": kw.get('name', False),
             "ktp_no": kw.get('ktp_no', False),
@@ -531,6 +331,7 @@ class WebsiteSale(http.Controller):
 
         render_values = {
             'website_sale_order': order,
+            'package_ids': package_ids,
             'callback': kw.get('callback'),
         }
         return request.render("ff_travel_umroh_portal.jamaah", render_values)

@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <odoo> 
-    <template id="assets_frontend_inherit" inherit_id="web.assets_frontend"> 
-        <xpath expr="script[last()]" position="after"> 
+    <!-- <template id="assets_frontend_inherit" name="ff_travel_umroh_portal.assets" inherit_id="web.assets_frontend"> 
+        <xpath expr="." position="inside"> 
             <script src="/ff_travel_umroh_portal/static/src/js/SaleOrder.js"/> 
         </xpath> 
-    </template> 
+    </template> -->
+    <template id="assets_common" inherit_id="web.assets_common">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" href="/ff_travel_umroh/static/src/css/custom.css" />
+            <script type="text/javascript" src="/ff_travel_umroh_portal/static/src/js/JamaahList.js" />
+        </xpath>
+    </template>
 </odoo> 

@@ -11,3 +11,4 @@ from . import res_blood_type
 from . import res_clothes_size
 from . import res_education
 from . import res_marital_status
+from . import product_attribute_value

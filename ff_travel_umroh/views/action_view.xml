@@ -72,15 +72,5 @@
       <field name="act_window_id" ref="travel_package_action"/>
     </record>
 
-    <!-- <record id="action_travel_all_jamaah" model="ir.actions.report">
-      <field name="name">Travel Package</field>
-      <field name="model">travel.package</field>
-      <field name="report_type">qweb-pdf</field>
-      <field name="report_name">ff_travel_umroh.report_travel_package_all_jamaah</field>
-      <field name="report_file">ff_travel_umroh.report_travel_package_all_jamaah</field>
-      <field name="print_report_name">'Travel Package - %s' % (object.name)</field>
-      <field name="binding_model_id" ref="model_travel_package"/>
-   </record> -->
-
   </data>
 </odoo>

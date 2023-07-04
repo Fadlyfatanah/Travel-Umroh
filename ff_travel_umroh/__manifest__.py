@@ -18,6 +18,7 @@
         'security/security.xml',
         'security/ir.model.access.csv',
         'data/ir_sequence_travel_package.xml',
+        'data/product_attribute_data.xml',
         'views/view_travel_package.xml',
         'views/view_sale_order.xml',
         'views/view_product.xml',

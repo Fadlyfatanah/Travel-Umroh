@@ -15,7 +15,6 @@ class TravelPackage(models.Model):
     name = fields.Char(required=True, copy=False, readonly=True, index=True, default=lambda self: _('/'))
     departure_date = fields.Date(required=True, string='Departure Date')
     return_date = fields.Date(required=True, string='Return Date')
-    product_id = fields.Many2one('product.product', 'Product')
     quota = fields.Integer('Quota')
     hotel_line = fields.One2many('hotel.lines', 'travel_id', string='Hotel')
     airlines_line = fields.One2many('airline.lines', 'travel_id', string='Airline')
@@ -92,18 +91,26 @@ class TravelPackage(models.Model):
         result = super(TravelPackage, self).create(vals)
         return result
     
+    def unlink(self):
+        super(TravelPackage, self).unlink()
+        self.delete_product_attribute_value()
+    
     def action_confirm(self):
         self.action_update_hpp()
         return self.write({'state': 'confirm'})
     
     def action_open(self):
         self.action_update_hpp()
+        # action to create product attribute value
+        self.create_product_attribute_value()
         return self.write({'state': 'open'})
     
     def action_done(self):
+        self.delete_product_attribute_value()
         return self.write({'state': 'done'})
     
     def action_to_draft(self):
+        self.delete_product_attribute_value()
         return self.write({'state': 'draft'})
     
     def name_get(self):
@@ -124,3 +131,26 @@ class TravelPackage(models.Model):
             rec.jamaah_count = len(rec.manifest_line.ids)
             rec.amount_total = rec.subtotal * rec.jamaah_count
     
+    def create_product_attribute(self):
+        val = {
+            'name': 'Package',
+            'create_variant': 'always',
+            'display_type': 'select',
+        }
+        attribute_id = self.env['product.attribute'].create(val)
+        return attribute_id
+
+    def create_product_attribute_value(self):
+        attribute_id = self.env.ref('ff_travel_umroh.product_attribute_1')
+        if not attribute_id:
+            attribute_id = self.create_product_attribute()
+        val = {
+            'name': '%s (%s - %s)' %(self.name, self.departure_date.strftime('%d %b'), self.return_date.strftime('%d %b')),
+            'attribute_id': attribute_id.id,
+            'is_custom': False,
+            'package_id': self.id,
+        }
+        self.env['product.attribute.value'].create(val)
+
+    def delete_product_attribute_value(self):
+        self.env['product.attribute.value'].search([('package_id', '=', self.id)]).unlink()
