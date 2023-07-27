@@ -27,7 +27,6 @@
               <field name="date_exp" />
               <field name="imigrasi" />
               <field name="age" force_save="1" />
-              <field name="room_type" />
               <field name="mahram_id" />
             </tree>
             <form>
@@ -37,7 +36,6 @@
                     <field name="name" domain="[('jamaah', '=', True)]"/>
                     <field name="ktp_no" readonly="1" />
                     <field name="place_birth" readonly="1" />
-                    <field name="room_type" />
                   </group>
                   <group>
                     <field name="title_id" />

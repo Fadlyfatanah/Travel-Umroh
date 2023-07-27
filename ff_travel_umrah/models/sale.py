@@ -5,7 +5,7 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
     _description = 'Sale Order'
 
-    manifest_line = fields.One2many('manifest.lines', 'order_id')
+    manifest_line = fields.One2many('manifest.line', 'order_id')
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'

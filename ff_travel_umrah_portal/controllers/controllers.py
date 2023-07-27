@@ -30,7 +30,7 @@ class WebsiteSaleTravel(WebsiteSale):
             .mapped('product_template_attribute_value_ids').mapped('product_attribute_value_id')\
             .mapped('package_id')
         manifest = int(kw.get('manifest')) if kw.get('manifest', False) else 0
-        manifest_line = request.env['manifest.lines'].sudo().browse(manifest)
+        manifest_line = request.env['manifest.line'].sudo().browse(manifest)
         manifest_line.sudo().unlink()
 
         render_values = {
@@ -183,9 +183,8 @@ class WebsiteSaleTravel(WebsiteSale):
             "mahram_id": kw.get('mahram_id', False),
             "notes": kw.get('notes', False),
             "agent_id": kw.get('agent_id', False),
-            "room_type": kw.get('room_type', False),
         }
-        request.env['manifest.lines'].sudo().create(manifest_value)
+        request.env['manifest.line'].sudo().create(manifest_value)
 
         render_values = {
             'website_sale_order': order,

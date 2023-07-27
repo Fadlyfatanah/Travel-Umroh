@@ -63,7 +63,7 @@
                     </h4>
                 </div>
                 <t
-                    t-foreach="request.env['manifest.lines'].sudo().search([('order_id', '=', website_sale_order.id), ('travel_id', '=', package.id)])"
+                    t-foreach="request.env['manifest.line'].sudo().search([('order_id', '=', website_sale_order.id), ('travel_id', '=', package.id)])"
                     t-as="manifest">
                     <div class="col-lg-12 one_kanban">
                         <t t-call="ff_travel_umrah_portal.jamaah_kanban">

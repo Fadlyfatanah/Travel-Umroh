@@ -22,12 +22,6 @@ class ManifestLines(models.Model):
     notes = fields.Char(string='Notes', size=50)
     order_id = fields.Many2one('sale.order', string='Sale')
     agent_id = fields.Many2one('res.users')
-    room_type = fields.Selection([
-        ('del', 'Deluxe'),
-        ('tri', 'Triple'),
-        ('quad', 'Quad'),
-        ('reg', 'Regular')
-    ])
 
     def calculate_age(self):
         if self.date_birth:
