@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?> 
-<templates xml:space="preserve"> 
-    <t t-name="ff_travel_umroh.sale_order" owl="1"> 
-        <div>My cool new widget</div> 
-    </t> 
-</templates>    

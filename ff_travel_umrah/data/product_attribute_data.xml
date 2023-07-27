@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="ff_travel_umrah.product_attribute_1" model="product.attribute">
+        <field name="name">Package</field>
+        <field name="create_variant">always</field>
+        <field name="display_type">select</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,177 @@
+<odoo>
+  <data>
+
+    <!-- ### Membuat Tree View Travel Package ### -->
+
+    <record id="travel_package_tree" model="ir.ui.view">
+      <field name="name">travel.package.tree</field>
+      <field name="model">travel.package</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name"/>
+          <field name="departure_date"/>
+          <field name="return_date"/>
+          <field name="quota"/>
+          <field name="quota_progress" widget="progressbar"/>
+          <field name="amount_total"/>
+          <field name="state"/>
+        </tree>
+      </field>
+    </record>
+
+    <!-- ### Membuat Form View Travel Package ### -->
+
+    <record id="travel_package_view_form" model="ir.ui.view">
+      <field name="name">travel.package.view.form</field>
+      <field name="model">travel.package</field>
+      <field name="arch" type="xml">
+        <form string="Travel Package">
+          <header>
+            <button name="action_confirm" string="Confirm" type="object" states="draft" class="oe_highlight"/>
+            <button name="action_open" string="Open" type="object" states="confirm" class="oe_highlight"/>
+            <button name="action_done" string="Done" type="object" states="open" class="oe_highlight"/>
+            <button name="action_to_draft" string="Set to Draft" type="object" states="confirm,open"/>
+            <field name="state" widget="statusbar" statusbar_visible="draft,confirm,open,done"/>
+          </header>
+          <sheet>
+            <div class="oe_title">
+              <h1>
+                <field name="name" nolabel="1" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
+              </h1>
+            </div>
+            <group>
+              <group string="Information" colspan="4">
+                <group>
+                  <field name="departure_date" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
+                  <field name="muthawif_id" attrs="{'readonly': [('state', 'not in', ['draft'])]}" options="{'no_open': True, 'no_create': True}"/>
+                </group>
+                <group>
+                  <field name="return_date" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
+                </group>
+              </group>
+              <group string="Seats" colspan="4">
+                <group>
+                  <field name="quota" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
+                  <field name="remaining_seats"/>
+                </group>
+                <group>
+                  <field name="quota_progress" widget="progressbar"/>
+                </group>
+              </group>
+            </group>
+            <notebook>
+              <page string="Hotel Lines">
+                <field name="hotel_line" attrs="{'readonly': [('state', 'not in', ['draft'])]}">
+                  <tree editable="bottom">
+                    <field name="name" context="{'default_company_type': 'company', 'default_hotel': True}" options="{'no_open': True, 'no_create': True}"/>
+                    <field name="start_date" />
+                    <field name="end_date" />
+                    <field name="city" />
+                    <field name="price"/>
+                    <field name="travel_id" invisible="1" />
+                  </tree>
+                </field>
+              </page>
+              <page string="Airlines">
+                <field name="airlines_line" attrs="{'readonly': [('state', 'not in', ['draft'])]}">
+                  <tree editable="bottom">
+                    <field name="name" context="{'default_company_type': 'company', 'default_airlines': True}" options="{'no_open': True, 'no_create': True}"/>
+                    <field name="departure_date" />
+                    <field name="departure_city" />
+                    <field name="arrival_city" />
+                    <field name="price"/>
+                    <field name="travel_id" invisible="1" />
+                  </tree>
+                </field>
+              </page>
+              <page string="Equipment">
+                <field name="equipment_line" attrs="{'readonly': [('state', 'not in', ['draft'])]}">
+                  <tree editable="bottom">
+                    <field name="product_id" context="{'package_ok': True}"/>
+                    <field name="product_qty"/>
+                    <field name="price"/>
+                    <field name="product_uom"/>
+                    <field name="price_subtotal"/>
+                  </tree>
+                </field>
+              </page>
+              <page string="Schedule Lines">
+                <field name="schedule_line" attrs="{'readonly': [('state', 'not in', ['draft'])]}">
+                  <tree editable="bottom">
+                    <field name="name" />
+                    <field name="date" />
+                    <field name="travel_id" invisible="1" />
+                  </tree>
+                </field>
+              </page>
+              <page string="Manifest">
+                <field name="manifest_line" readonly="1">
+                  <tree>
+                    <field name="gender" />
+                    <field name="pass_name" />
+                    <field name="pass_no" />
+                    <field name="ktp_no" />
+                    <field name="date_birth" />
+                    <field name="place_birth" />
+                    <field name="date_isue" />
+                    <field name="date_exp" />
+                    <field name="imigrasi" />
+                    <field name="age" />
+                    <field name="room_type" />
+                    <field name="mahram_id" />
+                    <field name="agent_id" />
+                  </tree>
+                  <form>
+                    <sheet>
+                      <group>
+                        <field name="gender" />
+                        <field name="pass_name" />
+                        <field name="pass_no" />
+                        <field name="ktp_no" />
+                        <field name="date_birth" />
+                        <field name="place_birth" />
+                        <field name="date_isue" />
+                      </group>
+                      <group>
+                        <field name="date_exp" />
+                        <field name="imigrasi" />
+                        <field name="age" />
+                        <field name="room_type" />
+                        <field name="mahram_id" />
+                        <field name="agent_id" />
+                      </group>
+                    </sheet>
+                  </form>
+                </field>
+              </page>
+              <page string="HPP Lines">
+                <field name="hpp_line" readonly="1">
+                  <tree editable="bottom">
+                    <field name="name" context="{'display_default_code': False}" options="{'no_open': True, 'no_create': True}"/>
+                    <field name="product_qty" />
+                    <field name="product_uom" />
+                    <field name="price" />
+                    <field name="price_subtotal" force_save="1" readonly="1" />
+                    <field name="travel_id" invisible="1" />
+                  </tree>
+                </field>
+                <group class="oe_subtotal_footer oe_right" colspan="2">
+                  <field name="subtotal" readonly="1"/>
+                  <field name="jamaah_count" readonly="1"/>
+                  <field name="amount_total" class="oe_subtotal_footer_separator"
+                    widget='monetary' options="{'currency_field': 'currency_id'}" force_save="1"
+                    readonly="1" />
+                </group>
+              </page>
+            </notebook>
+          </sheet>
+          <div class="oe_chatter">
+            <field name="message_follower_ids" widget="mail_followers"/>
+            <field name="message_ids" widget="mail_thread"/>
+          </div>
+        </form>
+      </field>
+    </record>
+
+  </data>
+</odoo>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="sale_order_portal_content" name="Sales Order Portal Content" inherit_id="sale.sale_order_portal_content">
+        <xpath expr="//div[@id='informations']/div[4]" position="replace">
+            <div class="row">
+                <div class="col-lg-6">
+                    <strong class="d-block mb-1">Invoicing Address:</strong>
+                    <address t-field="sale_order.partner_invoice_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
+                </div>
+            </div>
+        </xpath>
+        <xpath expr="//section[@id='details']" position="before">
+            <section id="manifest" style="page-break-inside: auto;" class="mt32">
+                <h3 id="manifest">Jamaah</h3>
+
+                <table t-att-data-order-id="sale_order.id" t-att-data-token="sale_order.access_token" class="table table-sm" id="sales_order_jamaah_table">
+                    <thead class="bg-100">
+                        <tr>
+                            <th class="text-left">Name</th>
+                            <th class="text-left">KTP</th>
+                            <th class="text-left">Age</th>
+                            <th class="text-left">Gender</th>
+                            <th class="text-left">Date of Birth</th>
+                        </tr>
+                    </thead>
+                    <tbody class="sale_tbody">
+
+                        <t t-foreach="sale_order.manifest_line" t-as="line">
+
+                             <tr>
+                                <td id="jamaah_name"><span t-field="line.name"/></td>
+                                <td id="jamaah_ktp"><span t-field="line.ktp_no"/></td>
+                                <td id="jamaah_age"><span t-field="line.age"/></td>
+                                <td id="jamaah_gender"><span t-field="line.gender"/></td>
+                                <td id="jamaah_birth"><span t-field="line.date_birth"/></td>
+                            </tr>
+
+                        </t>
+                    </tbody>
+                </table>
+
+            </section>
+        </xpath>
+    </template>
+
+</odoo>

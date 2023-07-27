@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+
+    <!-- ### Inherit Action/Event Customers ### -->
+
+    <record id="action_partner_form" model="ir.actions.act_window">
+      <field name="type">ir.actions.act_window</field>
+      <field name="name">Customers</field>
+      <field name="res_model">res.partner</field>
+      <field name="view_mode">kanban,tree,form</field>
+      <field name="domain">[('jamaah', '=', True)]</field>
+      <field name="context">{'default_customer':1, 'default_jamaah': 1}</field>
+    </record>
+    
+    <!-- ### Inherit Action/Event Customers ### -->
+    
+    <record id="action_partner_muthawif_form" model="ir.actions.act_window">
+      <field name="type">ir.actions.act_window</field>
+      <field name="name">Muthawif</field>
+      <field name="res_model">res.partner</field>
+      <field name="view_mode">kanban,tree,form</field>
+      <field name="domain">[('muthawif', '=', True)]</field>
+      <field name="context">{'default_muthawif':1}</field>
+    </record>
+
+    <!-- ### Inherit Action/Event Vendor Airlines ### -->
+
+    <record id="action_airlines_form" model="ir.actions.act_window">
+      <field name="type">ir.actions.act_window</field>
+      <field name="name">Airlines</field>
+      <field name="res_model">res.partner</field>
+      <field name="domain">[('airlines', '=', True)]</field>
+      <field name="view_mode">kanban,tree,form</field>
+      <field name="context">{'default_airlines': 1, 'default_company_type': 'company'}</field>
+    </record>
+
+    <!-- ### Inherit Action/Event Vendor Hotel ### -->
+
+    <record id="action_hotel_form" model="ir.actions.act_window">
+      <field name="type">ir.actions.act_window</field>
+      <field name="name">Hotel</field>
+      <field name="res_model">res.partner</field>
+      <field name="domain">[('hotel', '=', True)]</field>
+      <field name="view_mode">kanban,tree,form</field>
+      <field name="context">{'default_hotel': 1, 'default_company_type': 'company'}</field>
+    </record>
+
+    <!-- ### Membuat Action/Event Travel Package ### -->
+
+    <record id="travel_package_action" model="ir.actions.act_window">
+      <field name="type">ir.actions.act_window</field>
+      <field name="name">Travel Package</field>
+      <field name="res_model">travel.package</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_tree_view_travel_package" model="ir.actions.act_window.view">
+      <field name="sequence" eval="1"/>
+      <field name="view_mode">tree</field>
+      <field name="view_id" ref="ff_travel_umrah.travel_package_tree"/>
+      <field name="act_window_id" ref="ff_travel_umrah.travel_package_action"/>
+    </record>
+
+    <record id="action_form_view_travel_package" model="ir.actions.act_window.view">
+      <field name="sequence" eval="2"/>
+      <field name="view_mode">form</field>
+      <field name="view_id" ref="travel_package_view_form"/>
+      <field name="act_window_id" ref="ff_travel_umrah.travel_package_action"/>
+    </record>
+
+  </data>
+</odoo>
