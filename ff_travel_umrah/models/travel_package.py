@@ -12,7 +12,7 @@ class TravelPackage(models.Model):
     return_date = fields.Date(required=True, string='Return Date', size=8)
     quota = fields.Integer('Quota', size=3)
     hotel_line = fields.One2many('hotel.line', 'travel_id', string='Hotel')
-    airlines_line = fields.One2many('airline.line', 'travel_id', string='Airline')
+    airline_line = fields.One2many('airline.line', 'travel_id', string='Airline')
     equipment_line = fields.One2many('equipment.line', 'travel_id', string='Equipment')
     schedule_line = fields.One2many('schedule.line', 'travel_id', string='Schedule')
     hpp_line = fields.One2many('hpp.line', 'travel_id', string='HPP')
