@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
 
-class ManifestLines(models.Model):
+class ManifestLine(models.Model):
     _name = 'manifest.line'
     _description = 'Manifest Line'
 
@@ -48,7 +48,7 @@ class ManifestLines(models.Model):
     
     @api.model_create_multi
     def create(self, vals_list):
-        res_ids = super(ManifestLines, self).create(vals_list)
+        res_ids = super(ManifestLine, self).create(vals_list)
         for res in res_ids:
             agent_id = res.order_id.user_id if res.order_id else False
             res.agent_id = agent_id

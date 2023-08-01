@@ -1,6 +1,6 @@
 from odoo import models, fields, api
 
-class AirlineLines(models.Model):
+class AirlineLine(models.Model):
     _name = 'airline.line'
     _description = 'Airline Line'
     

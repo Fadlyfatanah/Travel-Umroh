@@ -1,6 +1,6 @@
 from odoo import models, fields, api
 
-class HotelLines(models.Model):
+class HotelLine(models.Model):
     _name = 'hotel.line'
     _description = 'Hotel Line'
 

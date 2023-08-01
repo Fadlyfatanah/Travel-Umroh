@@ -11,9 +11,9 @@
     'depends': ['base', 'website', 'website_sale', 'ff_travel_umrah', 'ff_website_sale_payment_settings'],
     'data': [
         'views/ir_qweb_widget_templates.xml',
+        'views/jamaah_website_templates.xml',
         'views/res_config_settings_views.xml',
         'views/sale_portal_templates.xml',
-        'views/templates.xml',
     ],
     'application': True,
     "license": "LGPL-3",

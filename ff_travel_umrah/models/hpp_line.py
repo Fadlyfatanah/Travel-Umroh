@@ -1,6 +1,6 @@
 from odoo import models, fields, api
 
-class HppLines(models.Model):
+class HppLine(models.Model):
     _name = 'hpp.line'
     _description = 'Hpp Line'
     

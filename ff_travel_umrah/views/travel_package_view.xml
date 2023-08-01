@@ -73,7 +73,7 @@
                 </field>
               </page>
               <page string="Airlines">
-                <field name="airlines_line" attrs="{'readonly': [('state', 'not in', ['draft'])]}">
+                <field name="airline_line" attrs="{'readonly': [('state', 'not in', ['draft'])]}">
                   <tree editable="bottom">
                     <field name="name" context="{'default_company_type': 'company', 'default_airlines': True}" options="{'no_open': True, 'no_create': True}"/>
                     <field name="departure_date" />

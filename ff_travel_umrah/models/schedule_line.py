@@ -1,6 +1,6 @@
 from odoo import models, fields, api
 
-class ScheduleLines(models.Model):
+class ScheduleLine(models.Model):
     _name = 'schedule.line'
     _description = 'Schedule Line'
     
