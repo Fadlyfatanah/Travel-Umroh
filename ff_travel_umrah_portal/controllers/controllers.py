@@ -3,11 +3,57 @@ import json
 
 from odoo import http, _
 from odoo.addons.website_sale.controllers.main import WebsiteSale
-from odoo.http import request
+from odoo.http import request, Controller
 
+class CustomerPortal(Controller):
+
+    @http.route(['/my/jamaah'], type='http', methods=['GET', 'POST'], auth="user", website=True, sitemap=False)
+    def my_jamaah_portal(self, **kw):
+        user_id = request.env['res.users'].browse(request.session.uid)
+        child_ids = user_id.partner_id.child_ids
+        values = {
+            "child_ids": child_ids,
+        }
+        return request.render("ff_travel_umrah_portal.jamaah_list", values)
+    
+    @http.route(['/my/jamaah/delete'], type='http', methods=['GET', 'POST'], auth="public", website=True, sitemap=False)
+    def my_jamaah_delete(self, **kw):
+        partner_id = request.env['res.partner'].browse(int(kw.get('contact_id', False)))
+        if partner_id:
+         partner_id.sudo().unlink()
+        return self.my_jamaah_portal()
+    
+    @http.route(['/my/jamaah/register'], type='http', methods=['GET', 'POST'], auth="public", website=True, sitemap=False)
+    def my_jamaah_register(self, **kw):
+        values = kw
+        Partner = request.env['res.partner']
+        partner_id = Partner.browse(int(kw.get('partner_id', False)))
+        title_id = request.env['res.partner.title'].sudo().search([('type', '=', 'person')])
+        # blood_type = request.env['res.blood.type'].sudo().search([])
+        clothes_size_id = request.env['res.clothes.size'].sudo().search([])
+        education_id = request.env['res.education'].sudo().search([])
+        marital_status_id = request.env['res.marital.status'].sudo().search([])
+        errors = {}
+        if partner_id:
+            values = partner_id
+
+        render_values = {
+            # 'website_sale_order': order,
+            'partner_id': partner_id.id,
+            'title_id': title_id,
+            # 'blood_type': blood_type,
+            'clothes_size_id': clothes_size_id,
+            'education_id': education_id,
+            'marital_status_id': marital_status_id,
+            'jamaah': values,
+            'error': errors,
+            'callback': kw.get('callback'),
+        }
+        return request.render("ff_travel_umrah_portal.jamaah_form", render_values)
+    
 class WebsiteSaleTravel(WebsiteSale):
 
-    @http.route(['/shop/jamaah'], type='http', methods=['GET', 'POST'], auth="public", website=True, sitemap=False)
+    @http.route(['/shop/jamaah'], type='http', methods=['GET', 'POST'], auth="user", website=True, sitemap=False)
     def jamaah(self, **kw):
         errors = {}
         order = request.website.sale_get_order()
@@ -22,7 +68,7 @@ class WebsiteSaleTravel(WebsiteSale):
         }
         return request.render("ff_travel_umrah_portal.jamaah", render_values)
     
-    @http.route(['/shop/jamaah/delete'], type='http', methods=['GET', 'POST'], auth="public", website=True, sitemap=False)
+    @http.route(['/shop/jamaah/delete'], type='http', methods=['GET', 'POST'], auth="user", website=True, sitemap=False)
     def jamaah_delete(self, **kw):
         errors = {}
         order = request.website.sale_get_order()
@@ -40,7 +86,7 @@ class WebsiteSaleTravel(WebsiteSale):
         }
         return request.render("ff_travel_umrah_portal.jamaah", render_values)
     
-    @http.route(['/shop/jamaah/selection'], type='http', methods=['GET', 'POST'], auth="public", website=True, sitemap=False)
+    @http.route(['/shop/jamaah/selection'], type='http', methods=['GET', 'POST'], auth="user", website=True, sitemap=False)
     def jamaah_selection(self, **kw):
         order = request.website.sale_get_order()
         jamaah_ids = order.partner_id.child_ids.filtered(lambda c: c.jamaah == True)
@@ -49,12 +95,13 @@ class WebsiteSaleTravel(WebsiteSale):
                 "website_sale_order": order,
                 "jamaah_ids": jamaah_ids,
                 "package_id": kw.get('package_id', False),
+                "package_name": kw.get('package_name', False),
             }
             return request.render("ff_travel_umrah_portal.jamaah_selection", render_values)
         else:
             return self.jamaah_register(kw)
     
-    @http.route(['/shop/jamaah/selection/list'], type='http', methods=['GET'], auth="public", website=True, sitemap=False, csrf=False)
+    @http.route(['/shop/jamaah/selection/list'], type='http', methods=['GET'], auth="user", website=True, sitemap=False, csrf=False)
     def jamaah_selection_list(self, **kw):
         order = request.website.sale_get_order()
         jamaah_ids = order.partner_id.child_ids
@@ -67,7 +114,7 @@ class WebsiteSaleTravel(WebsiteSale):
         else:
             return self.jamaah_register(kw)
     
-    @http.route(['/shop/jamaah/selection/add'], type='http', methods=['POST'], auth="public", website=True, sitemap=False, csrf=False)
+    @http.route(['/shop/jamaah/selection/add'], type='http', methods=['POST'], auth="user", website=True, sitemap=False, csrf=False)
     def jamaah_selection_add(self, **kw):
         order = request.website.sale_get_order()
         package_ids = order.order_line.mapped('product_id')\
@@ -112,14 +159,15 @@ class WebsiteSaleTravel(WebsiteSale):
         }
         return request.render("ff_travel_umrah_portal.jamaah", render_values)
 
-    @http.route(['/shop/jamaah/register'], type='http', methods=['GET', 'POST'], auth="public", website=True, sitemap=False)
+    @http.route(['/shop/jamaah/register'], type='http', methods=['GET', 'POST'], auth="user", website=True, sitemap=False)
     def jamaah_register(self, **kw):
         values = kw
         Partner = request.env['res.partner']
         order = request.website.sale_get_order()
         partner_id = Partner.browse(int(kw.get('partner_id', order.partner_id.id)))
         title_id = request.env['res.partner.title'].sudo().search([('type', '=', 'person')])
-        blood_type = request.env['res.blood.type'].sudo().search([])
+        blood_type = partner_id._fields.get('blood_type', False).selection
+        gender = partner_id._fields.get('gender', False).selection
         clothes_size_id = request.env['res.clothes.size'].sudo().search([])
         education_id = request.env['res.education'].sudo().search([])
         marital_status_id = request.env['res.marital.status'].sudo().search([])
@@ -132,6 +180,7 @@ class WebsiteSaleTravel(WebsiteSale):
             'partner_id': partner_id.id,
             'title_id': title_id,
             'blood_type': blood_type,
+            'gender': gender,
             'clothes_size_id': clothes_size_id,
             'education_id': education_id,
             'marital_status_id': marital_status_id,
@@ -139,9 +188,9 @@ class WebsiteSaleTravel(WebsiteSale):
             'error': errors,
             'callback': kw.get('callback'),
         }
-        return request.render("ff_travel_umrah_portal.jamaah_register", render_values)
+        return request.render("ff_travel_umrah_portal.jamaah_form", render_values)
     
-    @http.route(['/shop/jamaah/register/add'], type='http', auth="public", website=True, sitemap=False)
+    @http.route(['/shop/jamaah/register/add'], type='http', auth="user", website=True, sitemap=False)
     def add_new_jamaah(self, **kw):
         order = request.website.sale_get_order()
         package_ids = order.order_line.mapped('product_id')\

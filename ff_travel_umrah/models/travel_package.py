@@ -57,8 +57,8 @@ class TravelPackage(models.Model):
                     'price': line.price,
                 }))
 
-        if len(self.airlines_line.ids) > 0:
-            for line in self.airlines_line:
+        if len(self.airline_line.ids) > 0:
+            for line in self.airline_line:
                 hpp_list.append((0, 0, {
                     'name': line.name.name,
                     'product_qty': 1,
