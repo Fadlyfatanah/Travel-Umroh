@@ -38,13 +38,13 @@
             <div id="wrap">
                 <div class="container oe_website_sale py-2">
                     <div class="row">
-                        <div class="col-lg-12">
+                        <div class="col-md-8">
                             <h4 class="o_page_header mt8">
                                 List Jamaah
                             </h4>
                         </div>
                         <t t-foreach="child_ids" t-as="contact">
-                            <div class="col-lg-12 one_kanban">
+                            <div class="col-md-8 one_kanban">
                                 <t t-call="ff_travel_umrah_portal.jamaah_list_kanban">
                                     <t t-set='contact' t-value="contact" />
                                 </t>
@@ -72,7 +72,7 @@
                             <form method="post" class="checkout_autoformat">
                                 <div class="form-row">
                                     <div
-                                        t-attf-class="form-group #{error.get('name') and 'o_has_error' or ''} col-lg-12 div_name">
+                                        t-attf-class="form-group #{error.get('name') and 'o_has_error' or ''} col-md-8 div_name">
                                         <label class="col-form-label" for="name">Name</label>
                                         <input id="name" type="text"
                                             class="form-control o_website_form_input"
@@ -81,7 +81,7 @@
                                     </div>
                                     <div class="w-100" />
                                     <div
-                                        t-attf-class="form-group #{error.get('ktp_no') and 'o_has_error' or ''} col-lg-12 div_ktp_no">
+                                        t-attf-class="form-group #{error.get('ktp_no') and 'o_has_error' or ''} col-md-8 div_ktp_no">
                                         <label class="col-form-label" for="ktp_no">KTP No</label>
                                         <input id="ktp_no" type="number" class="form-control"
                                             name="ktp_no" required=""
@@ -89,7 +89,7 @@
                                     </div>
                                     <div class="w-100" />
                                     <div
-                                        t-attf-class="form-group #{error.get('place_birth') and 'o_has_error' or ''} col-lg-12 div_place_birth">
+                                        t-attf-class="form-group #{error.get('place_birth') and 'o_has_error' or ''} col-md-8 div_place_birth">
                                         <label class="col-form-label" for="place_birth">Place of
                                             Birth </label>
                                         <input id="place_birth" type="text" class="form-control"
@@ -98,7 +98,7 @@
                                     </div>
                                     <div class="w-100" />
                                     <div
-                                        t-attf-class="form-group #{error.get('date_birth') and 'o_has_error' or ''} col-lg-12 div_date_birth">
+                                        t-attf-class="form-group #{error.get('date_birth') and 'o_has_error' or ''} col-md-8 div_date_birth">
                                         <label class="col-form-label" for="date_birth">Date of
                                             Birth </label>
                                         <input id="date_birth" type="date" class="form-control"
@@ -107,7 +107,7 @@
                                     </div>
                                     <div class="w-100" />
                                     <div
-                                        t-attf-class="form-group #{error.get('street') and 'o_has_error' or ''} col-lg-12 div_street">
+                                        t-attf-class="form-group #{error.get('street') and 'o_has_error' or ''} col-md-8 div_street">
                                         <label class="col-form-label" for="street">Street <span
                                                 class="d-none d-md-inline"> and Number</span></label>
                                         <input type="text" name="street"
@@ -116,7 +116,7 @@
                                     </div>
                                     <div class="w-100" />
                                     <div
-                                        t-attf-class="form-group #{error.get('street2') and 'o_has_error' or ''} col-lg-12 div_street2">
+                                        t-attf-class="form-group #{error.get('street2') and 'o_has_error' or ''} col-md-8 div_street2">
                                         <label class="col-form-label label-optional"
                                             for="street2">Street 2</label>
                                         <input type="text" name="street2"
@@ -146,7 +146,7 @@
                                     </t>
                                     <div class="w-100" />
                                     <div
-                                        t-attf-class="form-group #{error.get('phone') and 'o_has_error' or ''} col-lg-6"
+                                        t-attf-class="form-group #{error.get('phone') and 'o_has_error' or ''} col-md-8"
                                         id="div_phone">
                                         <label class="col-form-label" for="phone">Phone</label>
                                         <input type="tel" name="phone"
@@ -155,7 +155,7 @@
                                     </div>
                                     <div class="w-100" />
                                     <div
-                                        t-attf-class="form-group #{error.get('mobile') and 'o_has_error' or ''} col-lg-6"
+                                        t-attf-class="form-group #{error.get('mobile') and 'o_has_error' or ''} col-md-8"
                                         id="div_mobile">
                                         <label class="col-form-label" for="mobile">Mobile</label>
                                         <input type="tel" name="mobile"
@@ -164,7 +164,7 @@
                                     </div>
                                     <div class="w-100" />
                                     <div
-                                        t-attf-class="form-group #{error.get('email') and 'o_has_error' or ''} col-lg-6"
+                                        t-attf-class="form-group #{error.get('email') and 'o_has_error' or ''} col-md-8"
                                         id="div_email">
                                         <label class="col-form-label" for="email">Email</label>
                                         <input type="email" name="email"
@@ -173,7 +173,7 @@
                                     </div>
                                     <div class="w-100" />
                                     <div
-                                        t-attf-class="form-group #{error.get('title_id') and 'o_has_error' or ''} col-lg-6"
+                                        t-attf-class="form-group #{error.get('title_id') and 'o_has_error' or ''} col-md-8"
                                         id="div_title">
                                         <label class="col-form-label" for="title_id">Title</label>
                                         <select id="title_id" class="form-control">
@@ -187,7 +187,7 @@
                                     </div>
                                     <div class="w-100" />
                                     <div
-                                        t-attf-class="form-group #{error.get('father_name') and 'o_has_error' or ''} col-lg-6"
+                                        t-attf-class="form-group #{error.get('father_name') and 'o_has_error' or ''} col-md-8"
                                         id="div_father_name">
                                         <label class="col-form-label" for="father_name">Father's
                                             Name</label>
@@ -197,7 +197,7 @@
                                     </div>
                                     <div class="w-100" />
                                     <div
-                                        t-attf-class="form-group #{error.get('mother_name') and 'o_has_error' or ''} col-lg-6"
+                                        t-attf-class="form-group #{error.get('mother_name') and 'o_has_error' or ''} col-md-8"
                                         id="div_mother_name">
                                         <label class="col-form-label" for="mother_name">Mother's
                                             Name</label>
@@ -207,7 +207,7 @@
                                     </div>
                                     <div class="w-100" />
                                     <div
-                                        t-attf-class="form-group #{error.get('job') and 'o_has_error' or ''} col-lg-6"
+                                        t-attf-class="form-group #{error.get('job') and 'o_has_error' or ''} col-md-8"
                                         id="div_job">
                                         <label class="col-form-label" for="job">Job</label>
                                         <input type="text" name="job"
@@ -216,7 +216,7 @@
                                     </div>
                                     <div class="w-100" />
                                     <div
-                                        t-attf-class="form-group #{error.get('blood_type') and 'o_has_error' or ''} col-lg-6"
+                                        t-attf-class="form-group #{error.get('blood_type') and 'o_has_error' or ''} col-md-8"
                                         id="div_blood_type">
                                         <label class="col-form-label" for="blood_type">Blood
                                             Type</label>
@@ -231,7 +231,7 @@
                                     </div>
                                     <div class="w-100" />
                                     <div
-                                        t-attf-class="form-group #{error.get('gender') and 'o_has_error' or ''} col-lg-6"
+                                        t-attf-class="form-group #{error.get('gender') and 'o_has_error' or ''} col-md-8"
                                         id="div_gender">
                                         <label class="col-form-label" for="gender">Gender</label>
                                         <select id="gender" class="form-control">
@@ -245,7 +245,7 @@
                                     </div>
                                     <div class="w-100" />
                                     <div
-                                        t-attf-class="form-group #{error.get('marital_status_id') and 'o_has_error' or ''} col-lg-6"
+                                        t-attf-class="form-group #{error.get('marital_status_id') and 'o_has_error' or ''} col-md-8"
                                         id="div_marital_status">
                                         <label class="col-form-label" for="marital_status_id">Marital
                                             Status</label>
@@ -261,7 +261,7 @@
                                     </div>
                                     <div class="w-100" />
                                     <div
-                                        t-attf-class="form-group #{error.get('education_id') and 'o_has_error' or ''} col-lg-6"
+                                        t-attf-class="form-group #{error.get('education_id') and 'o_has_error' or ''} col-md-8"
                                         id="div_education">
                                         <label class="col-form-label" for="education_id">Education</label>
                                         <select id="education_id" class="form-control">
@@ -275,7 +275,7 @@
                                     </div>
                                     <div class="w-100" />
                                     <div
-                                        t-attf-class="form-group #{error.get('clothes_size_id') and 'o_has_error' or ''} col-lg-6"
+                                        t-attf-class="form-group #{error.get('clothes_size_id') and 'o_has_error' or ''} col-md-8"
                                         id="div_clothes_size">
                                         <label class="col-form-label" for="clothes_size_id">Clothes
                                             Size</label>
@@ -291,7 +291,7 @@
                                     </div>
                                     <div class="w-100" />
                                     <div
-                                        t-attf-class="form-group #{error.get('pass_no') and 'o_has_error' or ''} col-lg-6"
+                                        t-attf-class="form-group #{error.get('pass_no') and 'o_has_error' or ''} col-md-8"
                                         id="div_pass_no">
                                         <label class="col-form-label" for="pass_no">Passport No</label>
                                         <input type="text" name="pass_no"
@@ -300,7 +300,7 @@
                                     </div>
                                     <div class="w-100" />
                                     <div
-                                        t-attf-class="form-group #{error.get('pass_name') and 'o_has_error' or ''} col-lg-6"
+                                        t-attf-class="form-group #{error.get('pass_name') and 'o_has_error' or ''} col-md-8"
                                         id="div_pass_name">
                                         <label class="col-form-label" for="pass_name">Passport
                                             Name</label>
@@ -310,7 +310,7 @@
                                     </div>
                                     <div class="w-100" />
                                     <div
-                                        t-attf-class="form-group #{error.get('date_isue') and 'o_has_error' or ''} col-lg-6"
+                                        t-attf-class="form-group #{error.get('date_isue') and 'o_has_error' or ''} col-md-8"
                                         id="div_date_issue">
                                         <label class="col-form-label" for="date_isue">Date
                                             Issued</label>
@@ -320,7 +320,7 @@
                                     </div>
                                     <div class="w-100" />
                                     <div
-                                        t-attf-class="form-group #{error.get('date_exp') and 'o_has_error' or ''} col-lg-6"
+                                        t-attf-class="form-group #{error.get('date_exp') and 'o_has_error' or ''} col-md-8"
                                         id="div_date_exp">
                                         <label class="col-form-label" for="date_exp">Date of
                                             Expiry</label>
@@ -330,7 +330,7 @@
                                     </div>
                                     <div class="w-100" />
                                     <div
-                                        t-attf-class="form-group #{error.get('imigrasi') and 'o_has_error' or ''} col-lg-6"
+                                        t-attf-class="form-group #{error.get('imigrasi') and 'o_has_error' or ''} col-md-8"
                                         id="div_imigrasi">
                                         <label class="col-form-label" for="imigrasi">Imigrasi</label>
                                         <input type="text" name="imigrasi"
@@ -338,36 +338,6 @@
                                             t-att-value="'imigrasi' in jamaah and jamaah['imigrasi']" />
                                     </div>
 
-                                    <!-- <div class="w-100"/>
-                                    <div t-attf-class="form-group #{error.get('country_id') and 'o_has_error' or ''} col-lg-6
-                                    div_country">
-                                        <label class="col-form-label" for="country_id">Country</label>
-                                        <select id="country_id" name="country_id" t-attf-class="form-control #{error.get('country_id') and
-                                    'is-invalid' or ''}" t-att-mode="mode[1]">
-                                            <option value="">Country...</option>
-                                            <t t-foreach="countries" t-as="c">
-                                                <option t-att-value="c.id" t-att-selected="c.id == (country and country.id or -1)">
-                                                    <t t-esc="c.name" />
-                                                </option>
-                                            </t>
-                                        </select>
-                                    </div> -->
-                                    <!-- <div t-attf-class="form-group #{error.get('state_id')
-                                    and 'o_has_error' or ''} col-lg-6 div_state"
-                                    t-att-style="(not country or not country.state_ids) and
-                                    'display: none'">
-                                        <label class="col-form-label" for="state_id">State / Province</label>
-                                        <select name="state_id" t-attf-class="form-control #{error.get('state_id') and 'is-invalid' or ''}"
-                                    data-init="1">
-                                            <option value="">State / Province...</option>
-                                            <t t-foreach="country_states" t-as="s">
-                                                <option t-att-value="s.id" t-att-selected="s.id == ('state_id' in jamaah and country and
-                                    jamaah['state_id'] != '' and int(jamaah['state_id']))">
-                                                    <t t-esc="s.name" />
-                                                </option>
-                                            </t>
-                                        </select>
-                                    </div> -->
                                 </div>
 
                                 <input type="hidden" name="csrf_token"
